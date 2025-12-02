@@ -1,0 +1,10 @@
+Claimant: Jane Doe
+Policy: POL-12345
+Incident Date: 2025-06-12
+Type: Auto - Collision
+Amount Requested: 4200 USD
+
+Description:
+Rear-end collision at a traffic light. Minor injuries reported. Vehicle bumper and tail lights damaged.
+
+

@@ -1,0 +1,127 @@
+=== CLAIM RECORD 1 ===
+Claimant Name: Johnathan Miller
+Policy Number: AUTO-PL-984321
+Incident Date: 2025-03-14
+Claim Amount: $2,350.75
+Incident Description:
+On March 14, 2025, Mr. Miller reported that his vehicle was rear-ended at a traffic light during rush hour. The impact damaged the rear bumper, trunk lid, and parking sensors. No injuries were reported at the scene.
+
+------------------------------------------------------------
+
+=== CLAIM RECORD 2 ===
+This is a homeowner’s claim submitted online.
+
+Claimant: Sarah Thompson
+Policy #: HOME-112-457-BC
+Date of Incident: 02/28/2025
+Estimated Loss Amount: USD 8,920.00
+Details:
+A kitchen fire occurred on the evening of February 28, 2025, when cooking oil ignited on the stove. The fire was contained quickly but caused smoke damage to the cabinets, walls, and ceiling.
+
+(For extraction, use:)
+Claimant Name = Sarah Thompson
+Policy Number = HOME-112-457-BC
+Incident Date = 02/28/2025
+Claim Amount = 8920.00
+Incident Description = Kitchen fire causing smoke damage to cabinets, walls, and ceiling.
+
+------------------------------------------------------------
+
+=== CLAIM RECORD 3 ===
+Insured Party: Michael Rodriguez
+Policy Number: HLTH-777009
+Incident Date: 15 March 2025
+Claim Amount: $1,145.00
+Description of Incident:
+Mr. Rodriguez slipped on a wet floor at a grocery store, resulting in a sprained ankle. He visited an urgent care clinic on the same day and incurred medical expenses for X-rays, examination, and medication.
+
+------------------------------------------------------------
+
+=== CLAIM RECORD 4 ===
+Claim Notification Email (auto-forwarded):
+
+Hello,
+My name is Priya Desai and I need to file a claim under my travel policy.
+Policy No: TRV-2025-44902
+The incident happened on 2025/04/03.
+The total claim amount is approximately $3,600.00.
+
+During my trip, my checked baggage was lost in transit and never arrived at the destination. The luggage contained clothing, electronics, and personal items that had to be replaced.
+
+Thank you,
+Priya
+
+(Fields to extract: 
+Claimant Name: Priya Desai
+Policy Number: TRV-2025-44902
+Incident Date: 2025/04/03
+Claim Amount: $3,600.00
+Incident Description: Lost checked baggage with clothing, electronics, and personal items.)
+
+------------------------------------------------------------
+
+=== CLAIM RECORD 5 ===
+Paper form transcription:
+
+Name of Claimant: Robert Jenkins
+Policy ID: AUTO-COM-33018
+Date of Loss (MM/DD/YYYY): 01/09/2025
+Claimed Amount: 5,480.25 USD
+
+Narrative:
+The insured’s delivery van was sideswiped by another vehicle while merging onto the highway. The side panel and rear door were dented, and the right mirror was broken. No bodily injuries reported.
+
+------------------------------------------------------------
+
+=== CLAIM RECORD 6 ===
+Internal Phone Log – Claims Intake
+
+Caller identified as: Emily Carter
+Referencing policy number: RENT-55401-A
+Incident reportedly occurred on: April 21, 2025
+Estimated claim value: $950
+
+Incident summary:
+A leaking pipe in the upstairs bathroom caused water damage to the bedroom ceiling. The claimant reported discoloration, peeling paint, and damage to a ceiling light fixture.
+
+(For AI extraction:
+Claimant Name = Emily Carter
+Policy Number = RENT-55401-A
+Incident Date = April 21, 2025
+Claim Amount = $950
+Incident Description = Water damage to bedroom ceiling due to leaking bathroom pipe.)
+
+------------------------------------------------------------
+
+=== CLAIM RECORD 7 ===
+Short text claim:
+
+Claimant: Daniel Wu | Policy#: LIFE-7799-AB
+Date: 03-05-2025 | Amount: $12,000.00
+
+Description:
+Claim submitted for funeral expenses and related costs after the death of the insured’s spouse. Documentation includes funeral home invoice and death certificate.
+
+------------------------------------------------------------
+
+=== CLAIM RECORD 8 ===
+Chat transcript (export):
+
+Agent: Thank you for contacting Horizon Insurance. Who am I speaking with today?
+Customer: This is Olivia Martinez.
+Agent: Thank you, Ms. Martinez. Can you confirm your policy number?
+Customer: Yes, it’s HOME-998877.
+Agent: And what happened?
+Customer: On 7/4/2025 there was a severe thunderstorm and a large tree branch fell on our roof.
+Agent: I’m sorry to hear that. Do you know the approximate cost of repairs?
+Customer: The contractor estimate is around $14,250.
+Agent: I’ll note that. So that’s roof damage due to a fallen tree branch during a storm.
+
+(Extract as:
+Claimant Name: Olivia Martinez
+Policy Number: HOME-998877
+Incident Date: 7/4/2025
+Claim Amount: $14,250
+Incident Description: Roof damage from a large tree branch falling during a severe thunderstorm.)
+
+------------------------------------------------------------

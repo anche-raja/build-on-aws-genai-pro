@@ -1,0 +1,107 @@
+Warning: Policy file not found at policies/policy_snippets.json
+Starting batch test on 2 files with 2 models...
+
+Processing claims/claim1.txt with amazon.nova-micro-v1:0...
+Processing claims/claim1.txt with amazon.nova-lite-v1:0...
+Processing claims/claim2.txt with amazon.nova-micro-v1:0...
+Processing claims/claim2.txt with amazon.nova-lite-v1:0...
+
+--- FINAL REPORT ---
+[
+  {
+    "file": "claims/claim1.txt",
+    "model": "amazon.nova-micro-v1:0",
+    "extracted_info": "```json\n{\n  \"Claimant Name\": \"Jane Doe\",\n  \"Policy Number\": \"POL-12345\",\n  \"Incident Date\": \"2025-06-12\",\n  \"Claim Amount\": 4200,\n  \"Incident Description\": \"Rear-end collision at a traffic light. Minor injuries reported. Vehicle bumper and tail lights damaged.\"\n}\n```",
+    "relevant_policies": "",
+    "summary": "**Claim Summary:**\n\n**Claimant Name:** Jane Doe  \n**Policy Number:** POL-12345  \n**Incident Date:** June 12, 2025  \n**Claim Amount:** $4,200  \n\n**Incident Description:** Jane Doe was involved in a rear-end collision at a traffic light. The incident resulted in minor injuries and damage to the vehicle's bumper and tail lights. The total claim amount is $4,200.",
+    "validation": {
+      "consensus": "Warning: Models produced significantly different output lengths.",
+      "details": {
+        "amazon.nova-micro-v1:0": {
+          "status": "success",
+          "time_seconds": 0.543,
+          "output_length": 321,
+          "output": "Here is the extracted key information from the document:\n\n- **Name**: Jane Doe\n- **Policy**: POL-12345\n- **Date**: 2025-06-12\n- **Amount**: 4200 USD\n\nAdditional details:\n- **Type**: Auto - Collision\n- **Description**: Rear-end collision at a traffic light. Minor injuries reported. Vehicle bumper and tail lights damaged."
+        },
+        "amazon.nova-lite-v1:0": {
+          "status": "success",
+          "time_seconds": 0.416,
+          "output_length": 148,
+          "output": "Here is the key information extracted from the document:\n\n- **Name**: Jane Doe\n- **Policy**: POL-12345\n- **Date**: 2025-06-12\n- **Amount**: 4200 USD"
+        }
+      }
+    },
+    "metrics": {
+      "total_processing_time_sec": 2.37
+    }
+  },
+  {
+    "file": "claims/claim1.txt",
+    "model": "amazon.nova-lite-v1:0",
+    "extracted_info": "```json\n{\n  \"claimant_name\": \"Jane Doe\",\n  \"policy_number\": \"POL-12345\",\n  \"incident_date\": \"2025-06-12\",\n  \"claim_amount\": \"4200 USD\",\n  \"incident_description\": \"Rear-end collision at a traffic light. Minor injuries reported. Vehicle bumper and tail lights damaged.\"\n}\n```",
+    "relevant_policies": "",
+    "summary": "**Claim Summary:**\n\n**Claimant:** Jane Doe\n\n**Policy Number:** POL-12345\n\n**Incident Date:** June 12, 2025\n\n**Claim Amount:** $4,200 USD\n\n**Incident Description:** On June 12, 2025, Jane Doe was involved in a rear-end collision at a traffic light. The incident resulted in minor injuries and damage to the vehicle's bumper and tail lights. Jane Doe is seeking compensation for the damages incurred.",
+    "validation": {
+      "consensus": "Consensus: Models produced similar output lengths.",
+      "details": {
+        "amazon.nova-lite-v1:0": {
+          "status": "success",
+          "time_seconds": 0.486,
+          "output_length": 146,
+          "output": "Here is the key information extracted from the document:\n\n**Name:** Jane Doe  \n**Policy:** POL-12345  \n**Date:** 2025-06-12  \n**Amount:** 4200 USD"
+        }
+      }
+    },
+    "metrics": {
+      "total_processing_time_sec": 2.81
+    }
+  },
+  {
+    "file": "claims/claim2.txt",
+    "model": "amazon.nova-micro-v1:0",
+    "extracted_info": "```json\n[\n  {\n    \"Claimant Name\": \"Johnathan Miller\",\n    \"Policy Number\": \"AUTO-PL-984321\",\n    \"Incident Date\": \"2025-03-14\",\n    \"Claim Amount\": \"2350.75\",\n    \"Incident Description\": \"On March 14, 2025, Mr. Miller reported that his vehicle was rear-ended at a traffic light during rush hour. The impact damaged the rear bumper, trunk lid, and parking sensors. No injuries were reported at the scene.\"\n  },\n  {\n    \"Claimant Name\": \"Sarah Thompson\",\n    \"Policy Number\": \"HOME-112-457-BC\",\n    \"Incident Date\": \"2025-02-28\",\n    \"Claim Amount\": \"8920.00\",\n    \"Incident Description\": \"A kitchen fire occurred on the evening of February 28, 2025, when cooking oil ignited on the stove. The fire was contained quickly but caused smoke damage to the cabinets, walls, and ceiling.\"\n  },\n  {\n    \"Claimant Name\": \"Michael Rodriguez\",\n    \"Policy Number\": \"HLTH-777009\",\n    \"Incident Date\": \"2025-03-15\",\n    \"Claim Amount\": \"1145.00\",\n    \"Incident Description\": \"Mr. Rodriguez slipped on a wet floor at a grocery store, resulting in a sprained ankle. He visited an urgent care clinic on the same day and incurred medical expenses for X-rays, examination, and medication.\"\n  },\n  {\n    \"Claimant Name\": \"Priya Desai\",\n    \"Policy Number\": \"TRV-2025-44902\",\n    \"Incident Date\": \"2025-04-03\",\n    \"Claim Amount\": \"3600.00\",\n    \"Incident Description\": \"During my trip, my checked baggage was lost in transit and never arrived at the destination. The luggage contained clothing, electronics, and personal items that had to be replaced.\"\n  },\n  {\n    \"Claimant Name\": \"Robert Jenkins\",\n    \"Policy Number\": \"AUTO-COM-33018\",\n    \"Incident Date\": \"2025-01-09\",\n    \"Claim Amount\": \"5480.25\",\n    \"Incident Description\": \"The insured\u2019s delivery van was sideswiped by another vehicle while merging onto the highway. The side panel and rear door were dented, and the right mirror was broken. No bodily injuries reported.\"\n  },\n  {\n    \"Claimant Name\": \"Emily Carter\",\n    \"Policy Number\": \"RENT-55401-A\",\n    \"Incident Date\": \"2025-04-21\",\n    \"Claim Amount\": \"950\",\n    \"Incident Description\": \"A leaking pipe in the upstairs bathroom caused water damage to the bedroom ceiling. The claimant reported discoloration, peeling paint, and damage to a ceiling light fixture.\"\n  },\n  {\n    \"Claimant Name\": \"Daniel Wu\",\n    \"Policy Number\": \"LIFE-7799-AB\",\n    \"Incident Date\": \"2025-03-05\",\n    \"Claim Amount\": \"12000.00\",\n    \"Incident Description\": \"Claim submitted for funeral expenses and related costs after the death of the insured\u2019s spouse. Documentation includes funeral home invoice and death certificate.\"\n  },\n  {\n    \"Claimant Name\": \"Olivia Martinez\",\n    \"Policy Number\": \"HOME-998877\",\n    \"Incident Date\": \"2025-07-04\",\n    \"Claim Amount\": \"14250\",\n    \"Incident Description\": \"On 7/4/2025 there was a severe thunderstorm and a large tree branch fell on our roof.\"\n  }\n]\n```",
+    "relevant_policies": "",
+    "summary": "Here is a concise summary of the claims extracted from the provided data:\n\n1. **Johnathan Miller** (Policy: AUTO-PL-984321) - **Incident Date:** March 14, 2025\n   - **Claim Amount:** $2350.75\n   - **Description:** Vehicle rear-ended at a traffic light, causing damage to the rear bumper, trunk lid, and parking sensors. No injuries.\n\n2. **Sarah Thompson** (Policy: HOME-112-457-BC) - **Incident Date:** February 28, 2025\n   - **Claim Amount:** $8920.00\n   - **Description:** Kitchen fire caused by cooking oil ignited on the stove, resulting in smoke damage to cabinets, walls, and ceiling.\n\n3. **Michael Rodriguez** (Policy: HLTH-777009) - **Incident Date:** March 15, 2025\n   - **Claim Amount:** $1145.00\n   - **Description:** Sprained ankle from slipping on a wet floor in a grocery store; medical expenses for X-rays, examination, and medication.\n\n4. **Priya Desai** (Policy: TRV-2025-44902) - **Incident Date:** April 3, 2025\n   - **Claim Amount:** $3600.00\n   - **Description:** Lost checked baggage during travel containing clothing, electronics, and personal items.\n\n5. **Robert Jenkins** (Policy: AUTO-COM-33018) - **Incident Date:** January 9, 2025\n   - **Claim Amount:** $5480.25\n   - **Description:** Delivery van sideswiped on highway, causing dents to the side panel and rear door, and a broken right mirror. No injuries.\n\n6. **Emily Carter** (Policy: RENT-55401-A) - **Incident Date:** April 21, 2025\n   - **Claim Amount:** $950\n   - **Description:** Leaking pipe in upstairs bathroom caused water damage to the bedroom ceiling, including discoloration, peeling paint, and damage to a ceiling light fixture.\n\n7. **Daniel Wu",
+    "validation": {
+      "consensus": "Consensus: Models produced similar output lengths.",
+      "details": {
+        "amazon.nova-micro-v1:0": {
+          "status": "success",
+          "time_seconds": 1.663,
+          "output_length": 1979,
+          "output": "Here is the extracted key information from each claim record:\n\n1. **Claimant Name:** Johnathan Miller\n   **Policy Number:** AUTO-PL-984321\n   **Incident Date:** 2025-03-14\n   **Claim Amount:** $2,350.75\n   **Incident Description:** Vehicle rear-ended at a traffic light, damaging rear bumper, trunk lid, and parking sensors.\n\n2. **Claimant Name:** Sarah Thompson\n   **Policy Number:** HOME-112-457-BC\n   **Incident Date:** 02/28/2025\n   **Claim Amount:** $8,920.00\n   **Incident Description:** Kitchen fire causing smoke damage to cabinets, walls, and ceiling.\n\n3. **Claimant Name:** Michael Rodriguez\n   **Policy Number:** HLTH-777009\n   **Incident Date:** 15 March 2025\n   **Claim Amount:** $1,145.00\n   **Incident Description:** Sprained ankle from slipping on a wet floor at a grocery store.\n\n4. **Claimant Name:** Priya Desai\n   **Policy Number:** TRV-2025-44902\n   **Incident Date:** 2025/04/03\n   **Claim Amount:** $3,600.00\n   **Incident Description:** Lost checked baggage with clothing, electronics, and personal items.\n\n5. **Claimant Name:** Robert Jenkins\n   **Policy Number:** AUTO-COM-33018\n   **Incident Date:** 01/09/2025\n   **Claim Amount:** $5,480.25\n   **Incident Description:** Delivery van sideswiped, denting side panel and rear door, breaking right mirror.\n\n6. **Claimant Name:** Emily Carter\n   **Policy Number:** RENT-55401-A\n   **Incident Date:** April 21, 2025\n   **Claim Amount:** $950\n   **Incident Description:** Water damage to bedroom ceiling due to leaking bathroom pipe.\n\n7. **Claimant Name:** Daniel Wu\n   **Policy Number:** LIFE-7799-AB\n   **Incident Date:** 03-05-2025\n   **Claim Amount:** $12,000.00\n   **Incident Description:** Funeral expenses and related costs after the death of the insured\u2019s spouse.\n\n8. **Claimant Name:** Olivia Martinez\n   **Policy Number:** HOME-998877\n   **Incident Date:** 7/4/2025\n   **Claim Amount:** $14,250\n   **Incident Description:** Roof damage from a large tree branch falling during a severe thunderstorm."
+        },
+        "amazon.nova-lite-v1:0": {
+          "status": "success",
+          "time_seconds": 3.179,
+          "output_length": 2134,
+          "output": "Here is the extracted key information from the document:\n\n### Claim Record 1\n- **Claimant Name:** Johnathan Miller\n- **Policy Number:** AUTO-PL-984321\n- **Incident Date:** 2025-03-14\n- **Claim Amount:** $2,350.75\n- **Incident Description:** Rear-ended at a traffic light, damaging the rear bumper, trunk lid, and parking sensors.\n\n### Claim Record 2\n- **Claimant Name:** Sarah Thompson\n- **Policy Number:** HOME-112-457-BC\n- **Incident Date:** 02/28/2025\n- **Claim Amount:** $8,920.00\n- **Incident Description:** Kitchen fire causing smoke damage to cabinets, walls, and ceiling.\n\n### Claim Record 3\n- **Claimant Name:** Michael Rodriguez\n- **Policy Number:** HLTH-777009\n- **Incident Date:** 15 March 2025\n- **Claim Amount:** $1,145.00\n- **Incident Description:** Slipped on a wet floor at a grocery store, resulting in a sprained ankle and medical expenses.\n\n### Claim Record 4\n- **Claimant Name:** Priya Desai\n- **Policy Number:** TRV-2025-44902\n- **Incident Date:** 2025/04/03\n- **Claim Amount:** $3,600.00\n- **Incident Description:** Lost checked baggage with clothing, electronics, and personal items.\n\n### Claim Record 5\n- **Claimant Name:** Robert Jenkins\n- **Policy Number:** AUTO-COM-33018\n- **Incident Date:** 01/09/2025\n- **Claim Amount:** $5,480.25\n- **Incident Description:** Delivery van sideswiped by another vehicle, resulting in dents, broken mirror, and no bodily injuries.\n\n### Claim Record 6\n- **Claimant Name:** Emily Carter\n- **Policy Number:** RENT-55401-A\n- **Incident Date:** April 21, 2025\n- **Claim Amount:** $950\n- **Incident Description:** Water damage to bedroom ceiling due to leaking bathroom pipe.\n\n### Claim Record 7\n- **Claimant Name:** Daniel Wu\n- **Policy Number:** LIFE-7799-AB\n- **Incident Date:** 03-05-2025\n- **Claim Amount:** $12,000.00\n- **Incident Description:** Funeral expenses and related costs after the death of the insured\u2019s spouse.\n\n### Claim Record 8\n- **Claimant Name:** Olivia Martinez\n- **Policy Number:** HOME-998877\n- **Incident Date:** 7/4/2025\n- **Claim Amount:** $14,250\n- **Incident Description:** Roof damage from a large tree branch falling during a severe thunderstorm."
+        }
+      }
+    },
+    "metrics": {
+      "total_processing_time_sec": 8.54
+    }
+  },
+  {
+    "file": "claims/claim2.txt",
+    "model": "amazon.nova-lite-v1:0",
+    "extracted_info": "```json\n[\n  {\n    \"Claimant Name\": \"Johnathan Miller\",\n    \"Policy Number\": \"AUTO-PL-984321\",\n    \"Incident Date\": \"2025-03-14\",\n    \"Claim Amount\": \"$2,350.75\",\n    \"Incident Description\": \"On March 14, 2025, Mr. Miller reported that his vehicle was rear-ended at a traffic light during rush hour. The impact damaged the rear bumper, trunk lid, and parking sensors. No injuries were reported at the scene.\"\n  },\n  {\n    \"Claimant Name\": \"Sarah Thompson\",\n    \"Policy Number\": \"HOME-112-457-BC\",\n    \"Incident Date\": \"02/28/2025\",\n    \"Claim Amount\": \"8920.00\",\n    \"Incident Description\": \"Kitchen fire causing smoke damage to cabinets, walls, and ceiling.\"\n  },\n  {\n    \"Claimant Name\": \"Michael Rodriguez\",\n    \"Policy Number\": \"HLTH-777009\",\n    \"Incident Date\": \"15 March 2025\",\n    \"Claim Amount\": \"$1,145.00\",\n    \"Incident Description\": \"Mr. Rodriguez slipped on a wet floor at a grocery store, resulting in a sprained ankle. He visited an urgent care clinic on the same day and incurred medical expenses for X-rays, examination, and medication.\"\n  },\n  {\n    \"Claimant Name\": \"Priya Desai\",\n    \"Policy Number\": \"TRV-2025-44902\",\n    \"Incident Date\": \"2025/04/03\",\n    \"Claim Amount\": \"$3,600.00\",\n    \"Incident Description\": \"Lost checked baggage with clothing, electronics, and personal items.\"\n  },\n  {\n    \"Claimant Name\": \"Robert Jenkins\",\n    \"Policy Number\": \"AUTO-COM-33018\",\n    \"Incident Date\": \"01/09/2025\",\n    \"Claim Amount\": \"5,480.25\",\n    \"Incident Description\": \"The insured\u2019s delivery van was sideswiped by another vehicle while merging onto the highway. The side panel and rear door were dented, and the right mirror was broken. No bodily injuries reported.\"\n  },\n  {\n    \"Claimant Name\": \"Emily Carter\",\n    \"Policy Number\": \"RENT-55401-A\",\n    \"Incident Date\": \"April 21, 2025\",\n    \"Claim Amount\": \"$950\",\n    \"Incident Description\": \"Water damage to bedroom ceiling due to leaking bathroom pipe.\"\n  },\n  {\n    \"Claimant Name\": \"Daniel Wu\",\n    \"Policy Number\": \"LIFE-7799-AB\",\n    \"Incident Date\": \"03-05-2025\",\n    \"Claim Amount\": \"$12,000.00\",\n    \"Incident Description\": \"Claim submitted for funeral expenses and related costs after the death of the insured\u2019s spouse. Documentation includes funeral home invoice and death certificate.\"\n  },\n  {\n    \"Claimant Name\": \"Olivia Martinez\",\n    \"Policy Number\": \"HOME-998877\",\n    \"Incident Date\": \"7/4/2025\",\n    \"Claim Amount\": \"$14,250\",\n    \"Incident Description\": \"Roof damage from a large tree branch falling during a severe thunderstorm.\"\n  }\n]\n```",
+    "relevant_policies": "",
+    "summary": "### Summary of Claims\n\n1. **Claimant:** Johnathan Miller\n   - **Policy Number:** AUTO-PL-984321\n   - **Incident Date:** March 14, 2025\n   - **Claim Amount:** $2,350.75\n   - **Description:** Rear-ended at a traffic light; damaged rear bumper, trunk lid, and parking sensors.\n\n2. **Claimant:** Sarah Thompson\n   - **Policy Number:** HOME-112-457-BC\n   - **Incident Date:** February 28, 2025\n   - **Claim Amount:** $8,920.00\n   - **Description:** Kitchen fire causing smoke damage to cabinets, walls, and ceiling.\n\n3. **Claimant:** Michael Rodriguez\n   - **Policy Number:** HLTH-777009\n   - **Incident Date:** March 15, 2025\n   - **Claim Amount:** $1,145.00\n   - **Description:** Slipped on a wet floor at a grocery store, resulting in a sprained ankle and medical expenses.\n\n4. **Claimant:** Priya Desai\n   - **Policy Number:** TRV-2025-44902\n   - **Incident Date:** April 3, 2025\n   - **Claim Amount:** $3,600.00\n   - **Description:** Lost checked baggage containing clothing, electronics, and personal items.\n\n5. **Claimant:** Robert Jenkins\n   - **Policy Number:** AUTO-COM-33018\n   - **Incident Date:** January 9, 2025\n   - **Claim Amount:** $5,480.25\n   - **Description:** Delivery van sideswiped on the highway; damaged side panel, rear door, and broken right mirror.\n\n6. **Claimant:** Emily Carter\n   - **Policy Number:** RENT-55401-A\n   - **Incident Date:** April 21, 2025\n   - **Claim Amount:** $950\n   - **Description:** Water damage to bedroom ceiling due to a leaking bathroom pipe.\n\n7. **Claimant:** Daniel Wu\n   - **Policy Number:** LIFE-77",
+    "validation": {
+      "consensus": "Consensus: Models produced similar output lengths.",
+      "details": {
+        "amazon.nova-lite-v1:0": {
+          "status": "success",
+          "time_seconds": 2.978,
+          "output_length": 2154,
+          "output": "Here are the extracted key information from the provided document:\n\n### Claim Record 1\n- **Claimant Name:** Johnathan Miller\n- **Policy Number:** AUTO-PL-984321\n- **Incident Date:** 2025-03-14\n- **Claim Amount:** $2,350.75\n- **Incident Description:** Rear-ended vehicle at a traffic light, damaging rear bumper, trunk lid, and parking sensors.\n\n### Claim Record 2\n- **Claimant Name:** Sarah Thompson\n- **Policy Number:** HOME-112-457-BC\n- **Incident Date:** 02/28/2025\n- **Claim Amount:** $8,920.00\n- **Incident Description:** Kitchen fire causing smoke damage to cabinets, walls, and ceiling.\n\n### Claim Record 3\n- **Claimant Name:** Michael Rodriguez\n- **Policy Number:** HLTH-777009\n- **Incident Date:** 15 March 2025\n- **Claim Amount:** $1,145.00\n- **Incident Description:** Slipped on a wet floor at a grocery store, resulting in a sprained ankle and medical expenses.\n\n### Claim Record 4\n- **Claimant Name:** Priya Desai\n- **Policy Number:** TRV-2025-44902\n- **Incident Date:** 2025/04/03\n- **Claim Amount:** $3,600.00\n- **Incident Description:** Lost checked baggage with clothing, electronics, and personal items.\n\n### Claim Record 5\n- **Claimant Name:** Robert Jenkins\n- **Policy Number:** AUTO-COM-33018\n- **Incident Date:** 01/09/2025\n- **Claim Amount:** $5,480.25\n- **Incident Description:** Delivery van sideswiped by another vehicle, denting side panel and rear door, and breaking the right mirror.\n\n### Claim Record 6\n- **Claimant Name:** Emily Carter\n- **Policy Number:** RENT-55401-A\n- **Incident Date:** April 21, 2025\n- **Claim Amount:** $950\n- **Incident Description:** Water damage to bedroom ceiling due to leaking bathroom pipe.\n\n### Claim Record 7\n- **Claimant Name:** Daniel Wu\n- **Policy Number:** LIFE-7799-AB\n- **Incident Date:** 03-05-2025\n- **Claim Amount:** $12,000.00\n- **Incident Description:** Funeral expenses and related costs after the death of the insured\u2019s spouse.\n\n### Claim Record 8\n- **Claimant Name:** Olivia Martinez\n- **Policy Number:** HOME-998877\n- **Incident Date:** 7/4/2025\n- **Claim Amount:** $14,250\n- **Incident Description:** Roof damage from a large tree branch falling during a severe thunderstorm."
+        }
+      }
+    },
+    "metrics": {
+      "total_processing_time_sec": 11.95
+    }
+  }
+]
