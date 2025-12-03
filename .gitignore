@@ -209,3 +209,4 @@ __marimo__/
 /iac/.terraform.lock.hcl
 .terraform.lock.hcl
 .terraform/
+.DS_Store
