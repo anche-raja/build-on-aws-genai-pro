@@ -12,6 +12,7 @@
           "use_case.$": "$.use_case"
         }
       },
+      "ResultPath": "$.primary_response",
       "Retry": [
         {
           "ErrorEquals": ["States.TaskFailed"],
@@ -23,10 +24,27 @@
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error-info",
           "Next": "TryFallbackModel"
         }
       ],
-      "Next": "SuccessState"
+      "Next": "EvaluatePrimaryResponse"
+    },
+    "EvaluatePrimaryResponse": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.primary_response.Payload.statusCode",
+          "NumericGreaterThanEquals": 400,
+          "Next": "TryFallbackModel"
+        },
+        {
+          "Variable": "$.primary_response.Payload.statusCode",
+          "IsPresent": false,
+          "Next": "TryFallbackModel"
+        }
+      ],
+      "Default": "SuccessState"
     },
     "TryFallbackModel": {
       "Type": "Task",
@@ -39,6 +57,7 @@
           "is_fallback": true
         }
       },
+      "ResultPath": "$.fallback_response",
       "Retry": [
         {
           "ErrorEquals": ["States.TaskFailed"],
@@ -50,10 +69,27 @@
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.fallback_error",
           "Next": "GracefulDegradation"
         }
       ],
-      "Next": "SuccessState"
+      "Next": "EvaluateFallbackResponse"
+    },
+    "EvaluateFallbackResponse": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.fallback_response.Payload.statusCode",
+          "NumericGreaterThanEquals": 400,
+          "Next": "GracefulDegradation"
+        },
+        {
+          "Variable": "$.fallback_response.Payload.statusCode",
+          "IsPresent": false,
+          "Next": "GracefulDegradation"
+        }
+      ],
+      "Default": "SuccessState"
     },
     "GracefulDegradation": {
       "Type": "Task",

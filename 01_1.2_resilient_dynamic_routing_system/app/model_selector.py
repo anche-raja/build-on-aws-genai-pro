@@ -27,7 +27,18 @@ def lambda_handler(event, context):
         config = {"primary_model": "anthropic.claude-3-sonnet-20240229-v1:0"}
     
     # Extract request details
-    body = json.loads(event.get('body', '{}'))
+    # When invoked via Step Functions (Express), the payload is passed directly as the event
+    # When invoked via API Gateway Proxy, the payload is in 'body'
+    if 'body' in event:
+        try:
+            body = json.loads(event.get('body', '{}'))
+        except (TypeError, json.JSONDecodeError):
+             # Handle case where body might already be a dict (if pre-parsed)
+            body = event.get('body', {}) if isinstance(event.get('body'), dict) else {}
+    else:
+        # Assume direct invocation payload
+        body = event
+
     prompt = body.get('prompt', '')
     use_case = body.get('use_case', 'general')
     
@@ -98,6 +109,6 @@ def invoke_model(model_id, prompt):
         
     except Exception as e:
         print(f"Error invoking model {model_id}: {str(e)}")
-        # Return error message or try fallback model
-        return f"Error generating response: {str(e)}"
+        # RAISE the exception so Step Functions catches it as States.TaskFailed
+        raise e
 

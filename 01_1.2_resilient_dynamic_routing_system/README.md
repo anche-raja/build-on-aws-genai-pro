@@ -122,6 +122,34 @@ You can simulate a failure by temporarily revoking the primary Lambda's permissi
 **Simulate Degradation:**
 Force both primary and fallback paths to fail to see the static response.
 
+### Exercise Results
+
+The following live calls against the deployed API Gateway endpoint validate each branch of the workflow:
+
+```bash
+# 1) Primary succeeds (Claude Sonnet)
+curl -X POST https://lh7aylhe.execute-api.us-east-1.amazonaws.com/prod/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "What are the benefits of serverless architectures?", "use_case": "general"}'
+# → statusCode 200, model_used "anthropic.claude-3-sonnet-20240229-v1:0"
+
+# 2) Primary fails with AccessDenied, fallback handles request (Titan Express)
+curl -X POST https://lh7aylhe.execute-api.us-east-1.amazonaws.com/prod/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "What are the benefits of serverless architectures?", "use_case": "general"}'
+# → statusCode 200, model_used "FALLBACK:amazon.titan-text-express-v1"
+
+# 3) Primary + fallback fail, Graceful Degradation returns static response
+curl -X POST https://lh7aylhe.execute-api.us-east-1.amazonaws.com/prod/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "What are the benefits of serverless architectures?", "use_case": "general"}'
+# → statusCode 200, model_used "DEGRADED_SERVICE"
+```
+
+![Exercise results screenshot](result/output.png)
+
+These captures show the circuit-breaker progression from primary to fallback to degradation when successive failures occur.
+
 ## Key Learnings (Exam Domain 1)
 
 *   **Skill 1.2.1**: Selecting models based on performance and cost (Evaluator script).
