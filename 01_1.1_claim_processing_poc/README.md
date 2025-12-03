@@ -1,6 +1,6 @@
 # Insurance Claim Processing PoC 🏥📄
 
-Automate processing of claim documents to reduce manual effort and improve consistency using Amazon Bedrock.
+Automate processing of claim documents to reduce manual effort and improve consistency using Amazon Bedrock. 
 
 ## Architecture (Skill 1.1.1)
 

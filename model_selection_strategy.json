@@ -1,0 +1,22 @@
+{
+  "primary_model": "anthropic.claude-3-sonnet-20240229-v1:0",
+  "fallback_models": [
+    "amazon.titan-text-express-v1"
+  ],
+  "model_scores": [
+    {
+      "model_id": "anthropic.claude-3-sonnet-20240229-v1:0",
+      "latency": 6.18818998336792,
+      "similarity_score": 0.9,
+      "latency_score": 0.0,
+      "overall_score": 0.63
+    },
+    {
+      "model_id": "amazon.titan-text-express-v1",
+      "latency": 4.7091052532196045,
+      "similarity_score": 0.7,
+      "latency_score": 0.23901734337886704,
+      "overall_score": 0.56170520301366
+    }
+  ]
+}
