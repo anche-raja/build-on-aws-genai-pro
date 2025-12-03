@@ -11,6 +11,11 @@ A collection of Proof of Concepts (PoCs) and hands-on labs designed to help you 
     *   **Skills**: Designing architectures, implementing PoCs, and creating reusable components (Skills 1.1.1 - 1.1.3).
     *   **Tech Stack**: Amazon Bedrock, Python (Boto3), Prompt Engineering, Simple RAG.
 
+*   **[01_1.2_resilient_dynamic_routing_system](./01_1.2_resilient_dynamic_routing_system/README.md)**:
+    *   **Scenario**: Resilient Dynamic Routing System.
+    *   **Skills**: Model selection, resilient architecture, and continuous evaluation (Skills 1.2.1 - 1.2.3).
+    *   **Tech Stack**: Amazon Bedrock, AWS Step Functions, AWS AppConfig, AWS Lambda, Terraform.
+
 ### Reference Materials
 
 *   **[pdfs](./pdfs/)**: Contains relevant AWS guides and exam preparation materials.

@@ -6,17 +6,17 @@
   "model_scores": [
     {
       "model_id": "anthropic.claude-3-sonnet-20240229-v1:0",
-      "latency": 6.18818998336792,
+      "latency": 10.10886287689209,
       "similarity_score": 0.9,
       "latency_score": 0.0,
       "overall_score": 0.63
     },
     {
       "model_id": "amazon.titan-text-express-v1",
-      "latency": 4.7091052532196045,
-      "similarity_score": 0.7,
-      "latency_score": 0.23901734337886704,
-      "overall_score": 0.56170520301366
+      "latency": 4.783066749572754,
+      "similarity_score": 0.5,
+      "latency_score": 0.5268442348242358,
+      "overall_score": 0.5080532704472707
     }
   ]
 }

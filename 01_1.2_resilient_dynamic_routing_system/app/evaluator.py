@@ -158,18 +158,29 @@ def create_model_selection_strategy(results_df):
 
 # Run evaluation
 if __name__ == "__main__":
+    import os
+    
+    # Get directory of this script to determine output location
+    # Output to parent directory (01_1.2_resilient_dynamic_routing_system)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_dir = os.path.dirname(script_dir)
+    
     results_df = evaluate_models()
     
     # Save results to CSV
-    results_df.to_csv("model_evaluation_results.csv", index=False)
+    csv_path = os.path.join(output_dir, "model_evaluation_results.csv")
+    results_df.to_csv(csv_path, index=False)
+    print(f"Results saved to: {csv_path}")
     
     # Generate strategy
     strategy = create_model_selection_strategy(results_df)
     print(json.dumps(strategy, indent=2))
 
     # Save strategy to file for AppConfig
-    with open("model_selection_strategy.json", "w") as f:
+    strategy_path = os.path.join(output_dir, "model_selection_strategy.json")
+    with open(strategy_path, "w") as f:
         json.dump(strategy, f, indent=2)
+    print(f"Strategy saved to: {strategy_path}")
     
     # Print summary
     print("\nEvaluation Summary:")

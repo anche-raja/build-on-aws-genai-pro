@@ -1,0 +1,20 @@
+model_id,question,output,latency,token_count,similarity_score
+anthropic.claude-3-sonnet-20240229-v1:0,What is a 401(k) retirement plan?,"A 401(k) is a tax-advantaged retirement savings plan offered by many employers in the United States. Here are some key details about 401(k) plans:
+
+- It allows employees to contribute a portion of their pre-tax salary into an individual account. The contributions are deducted from their paycheck before income taxes are paid on it.
+
+- The money contributed grows tax-deferred until it is withdrawn in retirement.
+
+- Many employers also provide a matching contribution up to a certain percentage of the employee's contributions as an added benefit.
+
+- The total annual contributions from both the employee and employer are limited by the IRS ($22,500 for individuals under 50 in 2023).
+
+- Investment options within a 401(k) are chosen by the employee from mutual funds, stocks, bonds etc offered in the plan.
+
+- Early withdrawals before age 59 1/2 are subject to taxes and penalties in most cases.
+
+- 401(k) plans provide tax advantages for retirement savings compared to regular taxable investment accounts.
+
+The 401(k) is one of the most popular employer-sponsored retirement plans that allows employees to save and invest a portion of their paycheck towards retirement in a tax-efficient way.",10.10886287689209,191,0.9
+amazon.titan-text-express-v1,What is a 401(k) retirement plan?," company
+A 401(k) is a qualified retirement plan that allows you to set aside a portion of your pre-tax income, which is deducted from your paycheck and typically invested in an account such as a mutual fund or 401(k) plan. The money you invest in a 401(k) account is not subject to federal income tax until you withdraw it in retirement. ",4.783066749572754,61,0.5
