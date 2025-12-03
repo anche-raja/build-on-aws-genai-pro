@@ -210,3 +210,5 @@ __marimo__/
 .terraform.lock.hcl
 .terraform/
 .DS_Store
+terraform.tfstate
+terraform.tfstate.backup
