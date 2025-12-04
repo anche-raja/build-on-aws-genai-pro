@@ -21,6 +21,26 @@ This module provisions the infrastructure and helpers for the customer feedback 
     └── monitoring.tf  # CloudWatch dashboard
 ```
 
+## Architecture Overview
+
+1. **Raw Data Landing (S3)**  
+   - Reviews are uploaded to `s3://customer-feedback-analysis-<initials>/raw-data/`.  
+   - Terraform seeds the bucket with `customer_feedback.csv` and enforces public-access blocks.
+
+2. **Event-Driven Validation (Lambda + CloudWatch)**  
+   - An S3 `ObjectCreated` notification invokes `TextValidationFunction`.  
+   - The Lambda reads the new object, applies heuristic checks, emits a `QualityScore` metric, and writes a JSON result under `validation-results/`.  
+   - CloudWatch Logs capture execution details while the dashboard visualizes the quality scores.
+
+3. **Catalog & Data Quality (Glue)**  
+   - Glue crawler discovers table metadata under the `raw-data/` prefix and stores it in `customer_feedback_db`.  
+   - The Glue Data Quality ruleset (`customer_reviews_ruleset`) can be evaluated against that table to track pass rates.
+
+4. **Observability (CloudWatch Dashboard)**  
+   - Dashboard widgets display both Lambda `QualityScore` trends and Glue `RulesetPassRate`, enabling a unified health view across streaming and batch quality checks.
+
+This architecture ensures new feedback data is validated immediately while longer-running Glue DQ jobs and the dashboard provide historical visibility.
+
 ## Prerequisites
 
 - Terraform ≥ 1.6 with AWS credentials configured (profile or environment variables).
