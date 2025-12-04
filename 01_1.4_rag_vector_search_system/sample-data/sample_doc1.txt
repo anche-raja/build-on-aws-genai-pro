@@ -1,0 +1,48 @@
+Amazon Bedrock Overview
+
+Amazon Bedrock is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies like AI21 Labs, Anthropic, Cohere, Meta, Stability AI, and Amazon via a single API, along with a broad set of capabilities you need to build generative AI applications with security, privacy, and responsible AI.
+
+Key Features:
+
+1. Choice of Foundation Models
+Amazon Bedrock provides access to multiple foundation models, allowing you to choose the best model for your specific use case. You can experiment with different models and select the one that delivers the best performance for your application.
+
+2. Knowledge Bases
+Build RAG applications with Knowledge Bases for Amazon Bedrock. This feature allows you to connect foundation models to your data sources, enabling accurate, contextual responses based on your proprietary information.
+
+3. Agents for Amazon Bedrock
+Create intelligent agents that can execute complex business tasks by breaking them down into smaller steps, making API calls, and interacting with various data sources.
+
+4. Model Customization
+Fine-tune foundation models with your own data to create custom models that better understand your specific domain and use cases. Amazon Bedrock supports continued pre-training and fine-tuning.
+
+5. Security and Privacy
+Your data is never used to train the underlying foundation models. Amazon Bedrock provides enterprise-grade security features including VPC support, encryption at rest and in transit, and AWS PrivateLink support.
+
+6. Responsible AI
+Amazon Bedrock includes features for responsible AI development, including content filtering, bias detection, and toxicity detection to help you build safe and ethical AI applications.
+
+Use Cases:
+
+- Content Generation: Create high-quality content for marketing, product descriptions, and customer communications
+- Conversational AI: Build sophisticated chatbots and virtual assistants
+- Text Summarization: Automatically summarize long documents and reports
+- Code Generation: Generate code snippets and complete programs
+- Search and Discovery: Implement semantic search over your document repositories
+- Personalization: Create personalized recommendations and experiences
+
+Getting Started:
+
+To get started with Amazon Bedrock, you need to:
+1. Enable model access in the AWS Console
+2. Choose your foundation models
+3. Set up your development environment
+4. Start making API calls to invoke models
+
+Pricing:
+
+Amazon Bedrock offers flexible pricing options:
+- On-Demand: Pay only for what you use with no upfront commitments
+- Provisioned Throughput: Reserve model capacity for predictable workloads
+- Model Customization: Pay for training and storage of custom models
+

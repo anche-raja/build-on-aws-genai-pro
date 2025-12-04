@@ -1,0 +1,64 @@
+{
+  "queries": [
+    {
+      "id": 1,
+      "query": "What is Amazon Bedrock?",
+      "expected_topics": ["bedrock", "foundation models", "managed service"]
+    },
+    {
+      "id": 2,
+      "query": "How do I build a RAG application?",
+      "expected_topics": ["rag", "retrieval", "knowledge base"]
+    },
+    {
+      "id": 3,
+      "query": "What are vector embeddings?",
+      "expected_topics": ["embeddings", "vectors", "semantic search"]
+    },
+    {
+      "id": 4,
+      "query": "How does semantic chunking work?",
+      "expected_topics": ["chunking", "semantic", "sentence boundaries"]
+    },
+    {
+      "id": 5,
+      "query": "What is HNSW indexing?",
+      "expected_topics": ["hnsw", "indexing", "approximate search"]
+    },
+    {
+      "id": 6,
+      "query": "What are the best practices for RAG systems?",
+      "expected_topics": ["best practices", "rag", "optimization"]
+    },
+    {
+      "id": 7,
+      "query": "How much does Amazon Bedrock cost?",
+      "expected_topics": ["pricing", "cost", "on-demand"]
+    },
+    {
+      "id": 8,
+      "query": "What is the difference between OpenSearch and Elasticsearch?",
+      "expected_topics": ["opensearch", "elasticsearch", "comparison"]
+    }
+  ],
+  "conversation_examples": [
+    {
+      "conversation_id": "conv_1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "What is Amazon Bedrock?"
+        },
+        {
+          "role": "assistant",
+          "content": "Amazon Bedrock is a fully managed service that provides access to foundation models..."
+        },
+        {
+          "role": "user",
+          "content": "Can I customize the models?"
+        }
+      ]
+    }
+  ]
+}
+
