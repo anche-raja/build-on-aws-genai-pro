@@ -171,6 +171,145 @@ aws glue start-data-quality-ruleset-evaluation \
 
 Publishes `CustomerFeedback/DataQuality::RulesetPassRate` metric to CloudWatch.
 
+## Multimodal Data Processing (Extended Pipeline)
+
+This project supports processing **4 types of data modalities** beyond basic text validation:
+
+### 1. Text Review Processing (Amazon Comprehend)
+
+**Lambda Function**: `TextProcessingFunction`
+
+Processes validated text reviews (quality score ≥ 0.7) with NLP:
+- **Entity Extraction**: Identifies people, organizations, locations, products
+- **Sentiment Analysis**: Detects emotional tone (POSITIVE, NEGATIVE, NEUTRAL, MIXED)
+- **Key Phrases**: Extracts important topics and themes
+
+**Trigger**: S3 event on `validation-results/*_validation.json` files
+
+**Output**: `processed-data/<filename>_processed.json` with enriched insights
+
+**Example**:
+```bash
+aws s3 cp sample-data/review1.json s3://<bucket>/raw-data/
+# Automatically: Validates → Processes with Comprehend → Saves enriched data
+```
+
+### 2. Image Processing (Textract + Rekognition)
+
+**Lambda Function**: `ImageProcessingFunction`
+
+Extracts text and visual insights from product images:
+- **OCR (Textract)**: Extracts text from labels, packaging, documents
+- **Label Detection (Rekognition)**: Identifies objects, scenes, activities
+- **Text Detection (Rekognition)**: Backup text extraction with confidence scores
+
+**Trigger**: S3 event on `raw-data/images/*.{jpg,jpeg,png}` files
+
+**Output**: `processed-data/images/<filename>_processed.json`
+
+**Use Cases**: Product damage assessment, barcode/serial number extraction, packaging compliance
+
+**Example**:
+```bash
+aws s3 cp product_label.jpg s3://<bucket>/raw-data/images/
+```
+
+### 3. Audio Processing (Transcribe + Comprehend)
+
+**Lambda Functions**: 
+- `AudioProcessingFunction` (starts transcription)
+- `TranscriptionCompletionFunction` (processes completed transcription)
+
+Converts customer service calls to text with sentiment analysis:
+- **Speech-to-Text (Transcribe)**: Transcribes audio to text
+- **Speaker Diarization**: Identifies who said what (customer vs agent)
+- **Sentiment Analysis (Comprehend)**: Analyzes conversation tone
+- **Key Phrase Extraction**: Identifies main topics discussed
+
+**Trigger**: S3 event on `raw-data/audio/*.{mp3,wav,flac}` files
+
+**Flow**: Upload → Start Transcribe Job → EventBridge triggers completion → Process with Comprehend
+
+**Output**: `processed-data/audio/<job-name>_processed.json`
+
+**Example**:
+```bash
+aws s3 cp customer_call.mp3 s3://<bucket>/raw-data/audio/
+```
+
+### 4. Survey Processing (SageMaker Processing)
+
+**Script**: `sagemaker_survey_processing.py`
+
+Batch processes structured survey data at scale:
+- **Data Normalization**: Converts categorical ratings to numerical scores
+- **Statistical Aggregation**: Calculates averages, distributions, top issues
+- **Natural Language Summaries**: Generates text summaries from structured data
+
+**Trigger**: Manual execution via `run_sagemaker_survey_job.py`
+
+**Output**: 
+- `processed-data/surveys/survey_summaries.json` (per-response summaries)
+- `processed-data/surveys/survey_statistics.json` (aggregate statistics)
+
+**Example**:
+```bash
+python run_sagemaker_survey_job.py --bucket <bucket-name> --region us-east-1
+```
+
+### Multimodal Pipeline Flow
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    DATA INGESTION LAYER                       │
+└──────────────────────────────────────────────────────────────┘
+                              │
+            ┌─────────────────┼─────────────────┐
+            │                 │                 │
+            ▼                 ▼                 ▼
+      [Text Files]      [Images]         [Audio Files]
+      [Survey CSV]
+            │                 │                 │
+            ▼                 ▼                 ▼
+┌──────────────────────────────────────────────────────────────┐
+│               VALIDATION & PROCESSING LAYER                   │
+└──────────────────────────────────────────────────────────────┘
+            │                 │                 │
+    TextValidation    ImageProcessing   AudioProcessing
+    → Comprehend      → Textract        → Transcribe
+                      → Rekognition     → Comprehend
+            │                 │                 │
+            └─────────────────┼─────────────────┘
+                              ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    PROCESSED DATA STORE                       │
+│  • Entities & Sentiment                                       │
+│  • Visual Labels & Text                                       │
+│  • Transcripts & Speaker Labels                               │
+│  • Survey Summaries & Stats                                   │
+└──────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+                  [Ready for Foundation Models]
+```
+
+### AWS Services Used
+
+| Service | Purpose | Cost Consideration |
+|---------|---------|-------------------|
+| **Amazon Comprehend** | NLP (entities, sentiment, key phrases) | $0.0001 per unit (100 chars) |
+| **Amazon Textract** | OCR from images | $1.50 per 1000 pages |
+| **Amazon Rekognition** | Image labels & text detection | $1.00 per 1000 images |
+| **Amazon Transcribe** | Speech-to-text | $0.024 per minute |
+| **SageMaker Processing** | Batch data transformation | Instance hours |
+
+### Sample Data
+
+See `sample-data/SAMPLE_DATA_README.md` for:
+- Sample JSON reviews (3 files with different sentiments)
+- Sample survey CSV (10 responses)
+- Instructions for creating test images and audio files
+
 ## Monitoring
 
 **CloudWatch Dashboard Widgets**:

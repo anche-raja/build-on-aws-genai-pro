@@ -1,0 +1,12 @@
+customer_id,survey_date,overall_satisfaction,product_rating,service_rating,improvement_area,comments
+C12345,2024-12-01,5,5,5,None,Everything was perfect!
+C12346,2024-12-02,3,4,2,Customer Service,Slow response time from support team
+C12347,2024-12-03,1,1,1,Product Quality,Product broke immediately
+C12348,2024-12-01,4,4,4,Shipping Speed,Would be great if shipping was faster
+C12349,2024-12-02,5,5,5,None,Excellent experience from start to finish
+C12350,2024-12-03,2,3,2,Customer Service,Hard to reach customer service
+C12351,2024-12-01,4,5,3,Documentation,Product manual could be clearer
+C12352,2024-12-02,5,5,5,None,Best purchase I've made this year!
+C12353,2024-12-03,3,3,3,Pricing,Product is slightly overpriced
+C12354,2024-12-01,4,4,5,Product Features,Would like more color options
+
