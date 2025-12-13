@@ -259,6 +259,9 @@ resource "aws_s3_bucket_website_configuration" "amplify_deployment" {
 resource "aws_s3_bucket_policy" "amplify_deployment" {
   bucket = aws_s3_bucket.amplify_deployment.id
 
+  # Ensure public access block is configured first
+  depends_on = [aws_s3_bucket_public_access_block.amplify_deployment]
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
