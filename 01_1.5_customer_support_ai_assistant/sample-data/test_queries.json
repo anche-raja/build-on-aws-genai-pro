@@ -1,0 +1,120 @@
+[
+  {
+    "id": "test-1",
+    "query": "My EC2 instance is not responding to SSH connections",
+    "expected_intent": "ec2_troubleshooting",
+    "expected_services": ["ec2"],
+    "expected_confidence": "> 0.7",
+    "description": "Common EC2 connectivity issue"
+  },
+  {
+    "id": "test-2",
+    "query": "I'm getting access denied errors when trying to upload files to my S3 bucket",
+    "expected_intent": "s3_troubleshooting",
+    "expected_services": ["s3"],
+    "expected_confidence": "> 0.7",
+    "description": "S3 permissions issue"
+  },
+  {
+    "id": "test-3",
+    "query": "My Lambda function keeps timing out after 30 seconds",
+    "expected_intent": "lambda_troubleshooting",
+    "expected_services": ["lambda"],
+    "expected_confidence": "> 0.7",
+    "description": "Lambda timeout issue"
+  },
+  {
+    "id": "test-4",
+    "query": "How do I connect my EC2 instance to my RDS database?",
+    "expected_intent": "networking",
+    "expected_services": ["ec2", "rds"],
+    "expected_confidence": "> 0.5",
+    "description": "Multi-service networking question"
+  },
+  {
+    "id": "test-5",
+    "query": "I need help with AWS",
+    "expected_intent": "general_support",
+    "needs_clarification": true,
+    "expected_confidence": "< 0.5",
+    "description": "Vague query requiring clarification"
+  },
+  {
+    "id": "test-6",
+    "query": "Why is my AWS bill so high this month?",
+    "expected_intent": "billing_cost",
+    "escalation_required": true,
+    "expected_services": ["billing"],
+    "description": "Billing inquiry requiring escalation"
+  },
+  {
+    "id": "test-7",
+    "query": "My access key is AKIAIOSFODNN7EXAMPLE and it's not working",
+    "guardrail_trigger": true,
+    "blocked_reason": "contains credentials",
+    "description": "Should trigger security guardrail"
+  },
+  {
+    "id": "test-8",
+    "query": "When will AWS release the new service you mentioned?",
+    "guardrail_trigger": true,
+    "blocked_reason": "future features",
+    "description": "Should trigger future feature guardrail"
+  },
+  {
+    "id": "test-9",
+    "query": "This is completely unacceptable! My production system has been down for 3 hours!",
+    "expected_sentiment": "NEGATIVE",
+    "escalation_consideration": true,
+    "description": "Angry customer, may need escalation"
+  },
+  {
+    "id": "test-10",
+    "query": "I'm trying to set up a VPC with public and private subnets, but the instances in the private subnet can't access the internet",
+    "expected_intent": "networking",
+    "expected_services": ["vpc"],
+    "expected_confidence": "> 0.6",
+    "description": "VPC networking issue"
+  },
+  {
+    "id": "test-11",
+    "query": "How do I increase my service limits for EC2 instances?",
+    "expected_intent": "account_management",
+    "escalation_required": true,
+    "description": "Service limit increase request"
+  },
+  {
+    "id": "test-12",
+    "query": "My CloudFormation stack failed to create with an error about IAM permissions",
+    "expected_intent": "iam_security",
+    "expected_services": ["iam", "cloudformation"],
+    "expected_confidence": "> 0.6",
+    "description": "IAM permissions issue"
+  },
+  {
+    "id": "test-13",
+    "query": "Can you help me optimize my Lambda function's performance?",
+    "expected_intent": "lambda_troubleshooting",
+    "expected_services": ["lambda"],
+    "expected_confidence": "> 0.7",
+    "description": "Lambda optimization request"
+  },
+  {
+    "id": "test-14",
+    "query": "What's the best way to secure my S3 bucket?",
+    "expected_intent": "s3_troubleshooting",
+    "expected_services": ["s3", "security"],
+    "expected_confidence": "> 0.6",
+    "description": "S3 security best practices"
+  },
+  {
+    "id": "test-15",
+    "query": "My DynamoDB queries are running slowly",
+    "expected_intent": "rds_database",
+    "expected_services": ["dynamodb"],
+    "expected_confidence": "> 0.6",
+    "description": "DynamoDB performance issue"
+  }
+]
+
+

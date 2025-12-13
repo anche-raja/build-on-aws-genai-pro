@@ -1,0 +1,347 @@
+{
+  "Comment": "Customer Support AI Assistant Workflow with Prompt Engineering and Governance",
+  "StartAt": "CaptureUserQuery",
+  "States": {
+    "CaptureUserQuery": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${CaptureQueryFunctionArn}",
+        "Payload.$": "$"
+      },
+      "ResultPath": "$.captureResult",
+      "ResultSelector": {
+        "statusCode.$": "$.Payload.statusCode",
+        "session_id.$": "$.Payload.session_id",
+        "query.$": "$.Payload.query",
+        "user_id.$": "$.Payload.user_id",
+        "turn_count.$": "$.Payload.turn_count",
+        "guardrail_triggered.$": "$.Payload.guardrail_triggered",
+        "skip_processing.$": "$.Payload.skip_processing",
+        "response.$": "$.Payload.response"
+      },
+      "Next": "CheckGuardrailStatus",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "HandleError",
+          "ResultPath": "$.error"
+        }
+      ],
+      "TimeoutSeconds": 30
+    },
+    "CheckGuardrailStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.captureResult.guardrail_triggered",
+          "BooleanEquals": true,
+          "Next": "ReturnGuardrailResponse"
+        }
+      ],
+      "Default": "DetectIntent"
+    },
+    "ReturnGuardrailResponse": {
+      "Type": "Pass",
+      "Parameters": {
+        "statusCode": 200,
+        "session_id.$": "$.captureResult.session_id",
+        "query.$": "$.captureResult.query",
+        "response.$": "$.captureResult.response",
+        "guardrail_triggered": true,
+        "message": "Response generated based on guardrails"
+      },
+      "End": true
+    },
+    "DetectIntent": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${DetectIntentFunctionArn}",
+        "Payload": {
+          "query.$": "$.captureResult.query",
+          "session_id.$": "$.captureResult.session_id",
+          "user_id.$": "$.captureResult.user_id",
+          "skip_processing.$": "$.captureResult.skip_processing"
+        }
+      },
+      "ResultPath": "$.intentResult",
+      "ResultSelector": {
+        "intent.$": "$.Payload.intent",
+        "intent_confidence.$": "$.Payload.intent_confidence",
+        "is_confident.$": "$.Payload.is_confident",
+        "needs_clarification.$": "$.Payload.needs_clarification",
+        "template_id.$": "$.Payload.template_id",
+        "escalation_required.$": "$.Payload.escalation_required",
+        "detected_services.$": "$.Payload.detected_services",
+        "sentiment.$": "$.Payload.sentiment"
+      },
+      "Next": "CheckIntentClarity",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "GenerateResponseWithFallback",
+          "ResultPath": "$.intentError"
+        }
+      ],
+      "TimeoutSeconds": 30
+    },
+    "CheckIntentClarity": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.intentResult.intent_confidence",
+          "NumericLessThan": 0.5,
+          "Next": "GenerateResponseWithClarification"
+        },
+        {
+          "Variable": "$.intentResult.escalation_required",
+          "BooleanEquals": true,
+          "Next": "GenerateResponseWithEscalation"
+        }
+      ],
+      "Default": "GenerateResponse"
+    },
+    "GenerateResponseWithClarification": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${GenerateResponseFunctionArn}",
+        "Payload": {
+          "query.$": "$.captureResult.query",
+          "session_id.$": "$.captureResult.session_id",
+          "intent.$": "$.intentResult.intent",
+          "template_id.$": "$.intentResult.template_id",
+          "needs_clarification": true,
+          "escalation_required": false,
+          "skip_processing": false
+        }
+      },
+      "ResultPath": "$.responseResult",
+      "ResultSelector": {
+        "response.$": "$.Payload.response",
+        "model_id.$": "$.Payload.model_id",
+        "template_id.$": "$.Payload.template_id",
+        "response_type.$": "$.Payload.response_type",
+        "output_guardrail_triggered.$": "$.Payload.output_guardrail_triggered"
+      },
+      "Next": "PrepareOutput",
+      "TimeoutSeconds": 60
+    },
+    "GenerateResponseWithEscalation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${GenerateResponseFunctionArn}",
+        "Payload": {
+          "query.$": "$.captureResult.query",
+          "session_id.$": "$.captureResult.session_id",
+          "intent.$": "$.intentResult.intent",
+          "template_id.$": "$.intentResult.template_id",
+          "needs_clarification": false,
+          "escalation_required": true,
+          "skip_processing": false
+        }
+      },
+      "ResultPath": "$.responseResult",
+      "ResultSelector": {
+        "response.$": "$.Payload.response",
+        "model_id.$": "$.Payload.model_id",
+        "template_id.$": "$.Payload.template_id",
+        "response_type.$": "$.Payload.response_type",
+        "output_guardrail_triggered.$": "$.Payload.output_guardrail_triggered"
+      },
+      "Next": "PrepareOutput",
+      "TimeoutSeconds": 60
+    },
+    "GenerateResponse": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${GenerateResponseFunctionArn}",
+        "Payload": {
+          "query.$": "$.captureResult.query",
+          "session_id.$": "$.captureResult.session_id",
+          "intent.$": "$.intentResult.intent",
+          "template_id.$": "$.intentResult.template_id",
+          "needs_clarification": false,
+          "escalation_required": false,
+          "skip_processing": false
+        }
+      },
+      "ResultPath": "$.responseResult",
+      "ResultSelector": {
+        "response.$": "$.Payload.response",
+        "model_id.$": "$.Payload.model_id",
+        "template_id.$": "$.Payload.template_id",
+        "response_type.$": "$.Payload.response_type",
+        "output_guardrail_triggered.$": "$.Payload.output_guardrail_triggered",
+        "usage.$": "$.Payload.usage"
+      },
+      "Next": "ValidateQuality",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "GenerateResponseWithFallback",
+          "ResultPath": "$.responseError"
+        }
+      ],
+      "TimeoutSeconds": 60
+    },
+    "GenerateResponseWithFallback": {
+      "Type": "Pass",
+      "Parameters": {
+        "response": "I apologize, but I'm having trouble processing your request at the moment. Please try rephrasing your question or contact AWS Support directly for assistance.",
+        "model_id": "fallback",
+        "template_id": "fallback",
+        "response_type": "fallback",
+        "output_guardrail_triggered": false
+      },
+      "ResultPath": "$.responseResult",
+      "Next": "PrepareOutput"
+    },
+    "ValidateQuality": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${ValidateQualityFunctionArn}",
+        "Payload": {
+          "query.$": "$.captureResult.query",
+          "response.$": "$.responseResult.response",
+          "intent.$": "$.intentResult.intent",
+          "template_id.$": "$.responseResult.template_id",
+          "session_id.$": "$.captureResult.session_id"
+        }
+      },
+      "ResultPath": "$.qualityResult",
+      "ResultSelector": {
+        "quality_score.$": "$.Payload.quality_score",
+        "quality_passed.$": "$.Payload.quality_passed",
+        "needs_regeneration.$": "$.Payload.needs_regeneration",
+        "quality_validation.$": "$.Payload.quality_validation"
+      },
+      "Next": "CheckQuality",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "PrepareOutput",
+          "ResultPath": "$.qualityError"
+        }
+      ],
+      "TimeoutSeconds": 30
+    },
+    "CheckQuality": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.qualityResult.needs_regeneration",
+          "BooleanEquals": true,
+          "Next": "RegenerateResponse"
+        }
+      ],
+      "Default": "PrepareOutput"
+    },
+    "RegenerateResponse": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${GenerateResponseFunctionArn}",
+        "Payload": {
+          "query.$": "$.captureResult.query",
+          "session_id.$": "$.captureResult.session_id",
+          "intent.$": "$.intentResult.intent",
+          "template_id": "general_support",
+          "needs_clarification": false,
+          "escalation_required": false,
+          "skip_processing": false,
+          "regeneration": true
+        }
+      },
+      "ResultPath": "$.responseResult",
+      "ResultSelector": {
+        "response.$": "$.Payload.response",
+        "model_id.$": "$.Payload.model_id",
+        "template_id.$": "$.Payload.template_id",
+        "response_type.$": "$.Payload.response_type",
+        "output_guardrail_triggered.$": "$.Payload.output_guardrail_triggered"
+      },
+      "Next": "PrepareOutput",
+      "TimeoutSeconds": 60
+    },
+    "PrepareOutput": {
+      "Type": "Pass",
+      "Parameters": {
+        "statusCode": 200,
+        "session_id.$": "$.captureResult.session_id",
+        "query.$": "$.captureResult.query",
+        "response.$": "$.responseResult.response",
+        "intent.$": "$.intentResult.intent",
+        "intent_confidence.$": "$.intentResult.intent_confidence",
+        "template_id.$": "$.responseResult.template_id",
+        "model_id.$": "$.responseResult.model_id",
+        "response_type.$": "$.responseResult.response_type",
+        "quality_score.$": "$.qualityResult.quality_score",
+        "quality_passed.$": "$.qualityResult.quality_passed"
+      },
+      "Next": "CollectFeedback"
+    },
+    "CollectFeedback": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${CollectFeedbackFunctionArn}",
+        "Payload": {
+          "session_id.$": "$.session_id",
+          "interaction_id.$": "$.session_id",
+          "intent.$": "$.intent",
+          "template_id.$": "$.template_id",
+          "quality_score.$": "$.quality_score",
+          "quality_passed.$": "$.quality_passed",
+          "response_type.$": "$.response_type",
+          "model_id.$": "$.model_id",
+          "feedback_type": "implicit"
+        }
+      },
+      "ResultPath": "$.feedbackResult",
+      "Next": "ReturnResponse",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "ReturnResponse",
+          "ResultPath": "$.feedbackError"
+        }
+      ],
+      "TimeoutSeconds": 15
+    },
+    "ReturnResponse": {
+      "Type": "Pass",
+      "Parameters": {
+        "statusCode": 200,
+        "body": {
+          "session_id.$": "$.session_id",
+          "response.$": "$.response",
+          "intent.$": "$.intent",
+          "confidence.$": "$.intent_confidence",
+          "quality_score.$": "$.quality_score"
+        },
+        "metadata": {
+          "template_id.$": "$.template_id",
+          "model_id.$": "$.model_id",
+          "response_type.$": "$.response_type"
+        }
+      },
+      "End": true
+    },
+    "HandleError": {
+      "Type": "Pass",
+      "Parameters": {
+        "statusCode": 500,
+        "error": "An error occurred processing your request",
+        "details.$": "$.error"
+      },
+      "End": true
+    }
+  }
+}
+
+

@@ -405,3 +405,6 @@ if __name__ == "__main__":
     # manager.create_index("technical_docs")
     print("OpenSearch Manager initialized")
 
+
+
+

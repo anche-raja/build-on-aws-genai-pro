@@ -109,3 +109,6 @@ Amazon OpenSearch Service provides:
 - Automated backups and snapshots
 - Scalable architecture with auto-scaling
 
+
+
+

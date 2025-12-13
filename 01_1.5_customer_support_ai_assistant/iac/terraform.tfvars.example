@@ -1,0 +1,40 @@
+# Example Terraform Variables
+# Copy this file to terraform.tfvars and customize for your environment
+
+project_name = "customer-support-ai"
+environment  = "dev"
+aws_region   = "us-east-1"
+
+# Bedrock Configuration
+bedrock_model_id      = "anthropic.claude-3-sonnet-20240229-v1:0"
+bedrock_guardrail_id  = ""  # Optional: Set your Bedrock Guardrail ID
+
+# Quality and Performance Settings
+quality_threshold        = 70
+conversation_ttl_hours   = 24
+lambda_memory_size       = 512
+lambda_timeout           = 60
+
+# API Gateway Throttling
+api_throttle_burst_limit = 100
+api_throttle_rate_limit  = 50
+
+# Monitoring
+enable_cloudtrail           = true
+enable_xray                 = true
+enable_detailed_monitoring  = true
+cloudwatch_log_retention_days = 7
+
+# Feedback Analysis Schedule
+feedback_analysis_schedule = "rate(1 hour)"
+
+# Tags
+tags = {
+  Project     = "CustomerSupportAI"
+  ManagedBy   = "Terraform"
+  Environment = "dev"
+  CostCenter  = "Engineering"
+  Owner       = "ai-team@example.com"
+}
+
+

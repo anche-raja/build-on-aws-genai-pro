@@ -1,0 +1,20 @@
+# AWS Configuration
+aws_region  = "us-east-1"
+environment = "dev"
+
+# Project Configuration
+project_name = "genai-knowledge-assistant"
+
+# OpenSearch Configuration
+opensearch_instance_type   = "r6g.large.search"
+opensearch_data_nodes      = 2
+opensearch_ebs_volume_size = 100
+
+# Lambda Configuration
+lambda_timeout                = 60
+lambda_memory_size            = 1024
+document_processor_timeout    = 300
+
+# DynamoDB Configuration
+conversation_ttl_days = 30
+

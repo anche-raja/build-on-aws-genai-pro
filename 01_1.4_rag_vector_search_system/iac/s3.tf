@@ -57,3 +57,6 @@ resource "aws_lambda_permission" "allow_s3_invoke" {
   source_arn    = aws_s3_bucket.documents.arn
 }
 
+
+
+

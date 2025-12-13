@@ -1,0 +1,19 @@
+# Requirements for local development and testing
+
+# AWS SDK
+boto3==1.28.85
+botocore==1.31.85
+
+# OpenSearch client
+opensearch-py==2.3.1
+requests-aws4auth==1.2.3
+aws-requests-auth==0.4.3
+
+# Utilities
+python-dotenv==1.0.0
+
+# Development tools
+pytest==7.4.3
+pytest-mock==3.12.0
+moto==4.2.9
+
