@@ -31,21 +31,6 @@ resource "aws_cognito_user_pool" "users" {
     email_sending_account = "COGNITO_DEFAULT"
   }
 
-  # User attribute schema
-  schema {
-    name                = "email"
-    attribute_data_type = "String"
-    required            = true
-    mutable             = false
-  }
-
-  schema {
-    name                = "name"
-    attribute_data_type = "String"
-    required            = true
-    mutable             = true
-  }
-
   # MFA configuration (optional)
   mfa_configuration = "OPTIONAL"
 

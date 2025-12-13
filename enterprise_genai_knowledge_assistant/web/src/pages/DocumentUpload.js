@@ -16,6 +16,7 @@ import {
   ListItemText,
   ListItemIcon,
   IconButton,
+  Grid,
 } from '@mui/material';
 import {
   CloudUpload as UploadIcon,
@@ -241,7 +242,3 @@ export default function DocumentUpload({ user }) {
     </Box>
   );
 }
-
-// Import Grid
-import { Grid } from '@mui/material';
-

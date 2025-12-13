@@ -44,3 +44,35 @@ wheels/
 # Deployment info
 deployment_info.txt
 
+# Node.js / npm / React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.pnp
+.pnp.js
+
+# React build output
+web/build/
+web/dist/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Next.js (if used)
+.next/
+out/
+
+# Misc
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# OS
+.DS_Store
+Thumbs.db
+
