@@ -196,7 +196,7 @@ resource "aws_dynamodb_table" "audit_trail" {
 
   tags = {
     Name       = "${var.project_name}-audit-trail"
-    Compliance = "SOC2,HIPAA,GDPR"
+    Compliance = "SOC2-HIPAA-GDPR"
   }
 }
 
@@ -206,7 +206,7 @@ resource "aws_s3_bucket" "audit_logs" {
 
   tags = {
     Name       = "${var.project_name}-audit-logs"
-    Compliance = "SOC2,HIPAA,GDPR"
+    Compliance = "SOC2-HIPAA-GDPR"
   }
 }
 
@@ -244,6 +244,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "audit_logs" {
   rule {
     id     = "archive-old-logs"
     status = "Enabled"
+
+    filter {}
 
     transition {
       days          = 90

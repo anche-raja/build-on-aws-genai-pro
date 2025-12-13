@@ -181,3 +181,44 @@ output "feedback_endpoint" {
   value       = "${aws_api_gateway_stage.genai_knowledge_assistant.invoke_url}/feedback"
 }
 
+# Phase 7: Web Interface Outputs
+output "cognito_user_pool_id" {
+  description = "Cognito User Pool ID"
+  value       = aws_cognito_user_pool.users.id
+}
+
+output "cognito_user_pool_client_id" {
+  description = "Cognito User Pool Client ID"
+  value       = aws_cognito_user_pool_client.web_client.id
+}
+
+output "cognito_identity_pool_id" {
+  description = "Cognito Identity Pool ID"
+  value       = aws_cognito_identity_pool.main.id
+}
+
+output "cognito_domain" {
+  description = "Cognito User Pool Domain"
+  value       = "${aws_cognito_user_pool_domain.main.domain}.auth.${var.aws_region}.amazoncognito.com"
+}
+
+output "cloudfront_distribution_id" {
+  description = "CloudFront Distribution ID for web app"
+  value       = aws_cloudfront_distribution.amplify_app.id
+}
+
+output "cloudfront_domain_name" {
+  description = "CloudFront Domain Name for web app"
+  value       = aws_cloudfront_distribution.amplify_app.domain_name
+}
+
+output "web_app_url" {
+  description = "Web Application URL"
+  value       = "https://${aws_cloudfront_distribution.amplify_app.domain_name}"
+}
+
+output "s3_website_bucket" {
+  description = "S3 bucket for web app hosting"
+  value       = aws_s3_bucket.amplify_deployment.id
+}
+

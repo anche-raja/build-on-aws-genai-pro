@@ -178,6 +178,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "analytics_exports" {
     id     = "archive-old-analytics"
     status = "Enabled"
 
+    filter {}
+
     transition {
       days          = 90
       storage_class = "GLACIER"
