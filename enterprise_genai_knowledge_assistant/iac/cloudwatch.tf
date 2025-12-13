@@ -1,6 +1,6 @@
 # CloudWatch Dashboard for GenAI Knowledge Assistant
 resource "aws_cloudwatch_dashboard" "genai_knowledge_assistant" {
-  dashboard_name = "${var.project_name}-${var.environment}"
+  dashboard_name = var.project_name
 
   dashboard_body = jsonencode({
     widgets = [
@@ -119,7 +119,7 @@ resource "aws_cloudwatch_dashboard" "genai_knowledge_assistant" {
 
 # Lambda Error Alarm - Document Processor
 resource "aws_cloudwatch_metric_alarm" "document_processor_errors" {
-  alarm_name          = "${var.project_name}-document-processor-errors-${var.environment}"
+  alarm_name          = "${var.project_name}-document-processor-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "Errors"
@@ -137,7 +137,7 @@ resource "aws_cloudwatch_metric_alarm" "document_processor_errors" {
 
 # Lambda Error Alarm - Query Handler
 resource "aws_cloudwatch_metric_alarm" "query_handler_errors" {
-  alarm_name          = "${var.project_name}-query-handler-errors-${var.environment}"
+  alarm_name          = "${var.project_name}-query-handler-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "Errors"
@@ -155,7 +155,7 @@ resource "aws_cloudwatch_metric_alarm" "query_handler_errors" {
 
 # API Gateway 5XX Error Alarm
 resource "aws_cloudwatch_metric_alarm" "api_gateway_5xx_errors" {
-  alarm_name          = "${var.project_name}-api-5xx-errors-${var.environment}"
+  alarm_name          = "${var.project_name}-api-5xx-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "5XXError"
@@ -173,7 +173,7 @@ resource "aws_cloudwatch_metric_alarm" "api_gateway_5xx_errors" {
 
 # OpenSearch Cluster Status Alarm
 resource "aws_cloudwatch_metric_alarm" "opensearch_cluster_red" {
-  alarm_name          = "${var.project_name}-opensearch-cluster-red-${var.environment}"
+  alarm_name          = "${var.project_name}-opensearch-cluster-red"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "ClusterStatus.red"

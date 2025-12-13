@@ -1,6 +1,6 @@
 # S3 Bucket for document storage
 resource "aws_s3_bucket" "document_bucket" {
-  bucket = "${var.project_name}-documents-${var.environment}-${data.aws_caller_identity.current.account_id}"
+  bucket = "${var.project_name}-documents-${data.aws_caller_identity.current.account_id}"
 }
 
 resource "aws_s3_bucket_versioning" "document_bucket" {

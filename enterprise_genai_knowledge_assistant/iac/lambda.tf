@@ -25,7 +25,7 @@ resource "aws_cloudwatch_log_group" "query_handler" {
 # Document Processor Lambda Function
 resource "aws_lambda_function" "document_processor" {
   filename         = data.archive_file.document_processor.output_path
-  function_name    = "${var.project_name}-document-processor-${var.environment}"
+  function_name    = "${var.project_name}-document-processor"
   role             = aws_iam_role.lambda_execution_role.arn
   handler          = "app.handler"
   source_code_hash = data.archive_file.document_processor.output_base64sha256
@@ -57,7 +57,7 @@ resource "aws_lambda_function" "document_processor" {
 # Query Handler Lambda Function
 resource "aws_lambda_function" "query_handler" {
   filename         = data.archive_file.query_handler.output_path
-  function_name    = "${var.project_name}-query-handler-${var.environment}"
+  function_name    = "${var.project_name}-query-handler"
   role             = aws_iam_role.lambda_execution_role.arn
   handler          = "app.handler"
   source_code_hash = data.archive_file.query_handler.output_base64sha256

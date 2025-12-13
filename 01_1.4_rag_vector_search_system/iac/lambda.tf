@@ -106,3 +106,4 @@ resource "aws_cloudwatch_log_group" "rag_api" {
 
 
 
+

@@ -26,3 +26,4 @@ resource "aws_lambda_permission" "allow_eventbridge" {
 
 
 
+

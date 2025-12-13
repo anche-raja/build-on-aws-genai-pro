@@ -22,9 +22,8 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "GenAI-Knowledge-Assistant"
-      Environment = var.environment
-      ManagedBy   = "Terraform"
+      Project   = "GenAI-Knowledge-Assistant"
+      ManagedBy = "Terraform"
     }
   }
 }

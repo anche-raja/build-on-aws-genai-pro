@@ -56,3 +56,4 @@ output "bedrock_kb_role_arn" {
 
 
 
+

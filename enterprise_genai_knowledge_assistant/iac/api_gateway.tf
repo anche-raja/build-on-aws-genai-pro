@@ -1,6 +1,6 @@
 # API Gateway REST API
 resource "aws_api_gateway_rest_api" "genai_knowledge_assistant" {
-  name        = "${var.project_name}-api-${var.environment}"
+  name        = "${var.project_name}-api"
   description = "GenAI Knowledge Assistant API"
 
   endpoint_configuration {
@@ -208,7 +208,7 @@ resource "aws_api_gateway_deployment" "genai_knowledge_assistant" {
 resource "aws_api_gateway_stage" "genai_knowledge_assistant" {
   deployment_id = aws_api_gateway_deployment.genai_knowledge_assistant.id
   rest_api_id   = aws_api_gateway_rest_api.genai_knowledge_assistant.id
-  stage_name    = var.environment
+  stage_name    = "prod"
 
   xray_tracing_enabled = true
 
@@ -231,7 +231,7 @@ resource "aws_api_gateway_stage" "genai_knowledge_assistant" {
 
 # CloudWatch Log Group for API Gateway
 resource "aws_cloudwatch_log_group" "api_gateway" {
-  name              = "/aws/apigateway/${var.project_name}-${var.environment}"
+  name              = "/aws/apigateway/${var.project_name}"
   retention_in_days = 14
 }
 

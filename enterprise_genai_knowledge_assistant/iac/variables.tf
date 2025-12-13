@@ -4,16 +4,10 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "environment" {
-  description = "Environment name (e.g., dev, staging, prod)"
-  type        = string
-  default     = "dev"
-}
-
 variable "project_name" {
   description = "Project name for resource naming"
   type        = string
-  default     = "genai-knowledge-assistant"
+  default     = "gka"
 }
 
 variable "opensearch_instance_type" {

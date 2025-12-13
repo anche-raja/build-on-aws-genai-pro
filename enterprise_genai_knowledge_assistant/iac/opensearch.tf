@@ -1,6 +1,6 @@
 # OpenSearch Domain for vector search
 resource "aws_opensearch_domain" "vector_search" {
-  domain_name    = "${var.project_name}-${var.environment}"
+  domain_name    = var.project_name
   engine_version = "OpenSearch_2.5"
 
   cluster_config {
@@ -45,7 +45,7 @@ resource "aws_opensearch_domain" "vector_search" {
           AWS = aws_iam_role.lambda_execution_role.arn
         }
         Action   = "es:*"
-        Resource = "arn:aws:es:${var.aws_region}:${data.aws_caller_identity.current.account_id}:domain/${var.project_name}-${var.environment}/*"
+        Resource = "arn:aws:es:${var.aws_region}:${data.aws_caller_identity.current.account_id}:domain/${var.project_name}/*"
       }
     ]
   })
@@ -63,7 +63,7 @@ resource "random_password" "opensearch_master_password" {
 
 # Store OpenSearch password in AWS Secrets Manager
 resource "aws_secretsmanager_secret" "opensearch_password" {
-  name                    = "${var.project_name}-opensearch-password-${var.environment}"
+  name                    = "${var.project_name}-opensearch-password"
   recovery_window_in_days = 7
 }
 
