@@ -111,6 +111,13 @@ resource "aws_api_gateway_resource" "query" {
   path_part   = "query"
 }
 
+# Phase 6: Feedback endpoint
+resource "aws_api_gateway_resource" "feedback" {
+  rest_api_id = aws_api_gateway_rest_api.genai_knowledge_assistant.id
+  parent_id   = aws_api_gateway_rest_api.genai_knowledge_assistant.root_resource_id
+  path_part   = "feedback"
+}
+
 # POST /query
 resource "aws_api_gateway_method" "query_post" {
   rest_api_id   = aws_api_gateway_rest_api.genai_knowledge_assistant.id
@@ -227,6 +234,8 @@ resource "aws_api_gateway_stage" "genai_knowledge_assistant" {
       responseLength = "$context.responseLength"
     })
   }
+
+  depends_on = [aws_api_gateway_account.main]
 }
 
 # CloudWatch Log Group for API Gateway
@@ -248,3 +257,69 @@ resource "aws_api_gateway_method_settings" "genai_knowledge_assistant" {
   }
 }
 
+# Phase 6: Feedback endpoint
+resource "aws_api_gateway_resource" "feedback" {
+  rest_api_id = aws_api_gateway_rest_api.genai_knowledge_assistant.id
+  parent_id   = aws_api_gateway_rest_api.genai_knowledge_assistant.root_resource_id
+  path_part   = "feedback"
+}
+
+resource "aws_api_gateway_method" "feedback_post" {
+  rest_api_id   = aws_api_gateway_rest_api.genai_knowledge_assistant.id
+  resource_id   = aws_api_gateway_resource.feedback.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "feedback_post" {
+  rest_api_id             = aws_api_gateway_rest_api.genai_knowledge_assistant.id
+  resource_id             = aws_api_gateway_resource.feedback.id
+  http_method             = aws_api_gateway_method.feedback_post.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.query_handler.invoke_arn
+}
+
+resource "aws_api_gateway_method" "feedback_options" {
+  rest_api_id   = aws_api_gateway_rest_api.genai_knowledge_assistant.id
+  resource_id   = aws_api_gateway_resource.feedback.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "feedback_options" {
+  rest_api_id = aws_api_gateway_rest_api.genai_knowledge_assistant.id
+  resource_id = aws_api_gateway_resource.feedback.id
+  http_method = aws_api_gateway_method.feedback_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "feedback_options" {
+  rest_api_id = aws_api_gateway_rest_api.genai_knowledge_assistant.id
+  resource_id = aws_api_gateway_resource.feedback.id
+  http_method = aws_api_gateway_method.feedback_options.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "feedback_options" {
+  rest_api_id = aws_api_gateway_rest_api.genai_knowledge_assistant.id
+  resource_id = aws_api_gateway_resource.feedback.id
+  http_method = aws_api_gateway_method.feedback_options.http_method
+  status_code = aws_api_gateway_method_response.feedback_options.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}

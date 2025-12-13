@@ -1,3 +1,35 @@
+# IAM Role for API Gateway CloudWatch Logging
+resource "aws_iam_role" "api_gateway_cloudwatch_role" {
+  name = "${var.project_name}-api-gateway-cloudwatch-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "apigateway.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${var.project_name}-api-gateway-cloudwatch-role"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatch_policy" {
+  role       = aws_iam_role.api_gateway_cloudwatch_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
+
+# Set API Gateway account-level CloudWatch role
+resource "aws_api_gateway_account" "main" {
+  cloudwatch_role_arn = aws_iam_role.api_gateway_cloudwatch_role.arn
+}
+
 # IAM Role for Lambda Functions
 resource "aws_iam_role" "lambda_execution_role" {
   name = "${var.project_name}-lambda-execution-role"
@@ -38,7 +70,8 @@ resource "aws_iam_role_policy" "bedrock_policy" {
         Effect = "Allow"
         Action = [
           "bedrock:InvokeModel",
-          "bedrock:InvokeModelWithResponseStream"
+          "bedrock:InvokeModelWithResponseStream",
+          "bedrock:ApplyGuardrail"
         ]
         Resource = "*"
       }
@@ -78,7 +111,13 @@ resource "aws_iam_role_policy" "services_policy" {
         Resource = [
           aws_dynamodb_table.metadata_table.arn,
           aws_dynamodb_table.conversation_table.arn,
-          aws_dynamodb_table.evaluation_table.arn
+          aws_dynamodb_table.evaluation_table.arn,
+          aws_dynamodb_table.audit_trail.arn,
+          "${aws_dynamodb_table.audit_trail.arn}/index/*",
+          aws_dynamodb_table.user_feedback.arn,
+          "${aws_dynamodb_table.user_feedback.arn}/index/*",
+          aws_dynamodb_table.quality_metrics.arn,
+          "${aws_dynamodb_table.quality_metrics.arn}/index/*"
         ]
       },
       {
@@ -106,6 +145,32 @@ resource "aws_iam_role_policy" "services_policy" {
           "secretsmanager:GetSecretValue"
         ]
         Resource = aws_secretsmanager_secret.opensearch_password.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:PutLogEvents",
+          "logs:CreateLogStream"
+        ]
+        Resource = "${aws_cloudwatch_log_group.governance.arn}:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ]
+        Resource = aws_sns_topic.compliance_alerts.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject"
+        ]
+        Resource = [
+          "${aws_s3_bucket.audit_logs.arn}/*",
+          "${aws_s3_bucket.analytics_exports.arn}/*"
+        ]
       }
     ]
   })

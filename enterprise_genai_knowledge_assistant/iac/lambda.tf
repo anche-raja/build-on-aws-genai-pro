@@ -13,12 +13,12 @@ data "archive_file" "query_handler" {
 
 # CloudWatch Log Groups
 resource "aws_cloudwatch_log_group" "document_processor" {
-  name              = "/aws/lambda/${aws_lambda_function.document_processor.function_name}"
+  name              = "/aws/lambda/${var.project_name}-document-processor"
   retention_in_days = 14
 }
 
 resource "aws_cloudwatch_log_group" "query_handler" {
-  name              = "/aws/lambda/${aws_lambda_function.query_handler.function_name}"
+  name              = "/aws/lambda/${var.project_name}-query-handler"
   retention_in_days = 14
 }
 
@@ -39,12 +39,10 @@ resource "aws_lambda_function" "document_processor" {
       METADATA_TABLE     = aws_dynamodb_table.metadata_table.name
       OPENSEARCH_DOMAIN  = aws_opensearch_domain.vector_search.endpoint
       OPENSEARCH_SECRET  = aws_secretsmanager_secret.opensearch_password.name
-      AWS_REGION         = var.aws_region
     }
   }
 
   depends_on = [
-    aws_cloudwatch_log_group.document_processor,
     aws_iam_role_policy.bedrock_policy,
     aws_iam_role_policy.services_policy
   ]
@@ -72,12 +70,18 @@ resource "aws_lambda_function" "query_handler" {
       OPENSEARCH_DOMAIN   = aws_opensearch_domain.vector_search.endpoint
       OPENSEARCH_SECRET   = aws_secretsmanager_secret.opensearch_password.name
       EVALUATION_TABLE    = aws_dynamodb_table.evaluation_table.name
-      AWS_REGION          = var.aws_region
+      AUDIT_TRAIL_TABLE   = aws_dynamodb_table.audit_trail.name
+      GUARDRAIL_ID        = aws_bedrock_guardrail.content_safety.guardrail_id
+      GUARDRAIL_VERSION   = "DRAFT"
+      COMPLIANCE_SNS      = aws_sns_topic.compliance_alerts.arn
+      AUDIT_LOGS_BUCKET   = aws_s3_bucket.audit_logs.id
+      USER_FEEDBACK_TABLE = aws_dynamodb_table.user_feedback.name
+      QUALITY_METRICS_TABLE = aws_dynamodb_table.quality_metrics.name
+      QUALITY_LOG_GROUP   = aws_cloudwatch_log_group.quality_metrics.name
     }
   }
 
   depends_on = [
-    aws_cloudwatch_log_group.query_handler,
     aws_iam_role_policy.bedrock_policy,
     aws_iam_role_policy.services_policy
   ]

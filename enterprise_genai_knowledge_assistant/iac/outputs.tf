@@ -109,3 +109,75 @@ output "api_endpoints" {
   }
 }
 
+# Phase 5: Governance Outputs
+output "audit_trail_table_name" {
+  description = "Audit trail DynamoDB table name"
+  value       = aws_dynamodb_table.audit_trail.name
+}
+
+output "audit_logs_bucket_name" {
+  description = "S3 bucket for audit log archives"
+  value       = aws_s3_bucket.audit_logs.id
+}
+
+output "guardrail_id" {
+  description = "Bedrock Guardrail ID"
+  value       = aws_bedrock_guardrail.content_safety.guardrail_id
+}
+
+output "guardrail_arn" {
+  description = "Bedrock Guardrail ARN"
+  value       = aws_bedrock_guardrail.content_safety.guardrail_arn
+}
+
+output "compliance_alerts_topic" {
+  description = "SNS topic for compliance alerts"
+  value       = aws_sns_topic.compliance_alerts.arn
+}
+
+output "governance_dashboard_name" {
+  description = "Governance CloudWatch dashboard name"
+  value       = aws_cloudwatch_dashboard.governance.dashboard_name
+}
+
+output "governance_log_group" {
+  description = "CloudWatch log group for governance events"
+  value       = aws_cloudwatch_log_group.governance.name
+}
+
+# Phase 6: Monitoring & Evaluation Outputs
+output "user_feedback_table_name" {
+  description = "User feedback DynamoDB table name"
+  value       = aws_dynamodb_table.user_feedback.name
+}
+
+output "quality_metrics_table_name" {
+  description = "Quality metrics DynamoDB table name"
+  value       = aws_dynamodb_table.quality_metrics.name
+}
+
+output "analytics_exports_bucket_name" {
+  description = "S3 bucket for analytics exports"
+  value       = aws_s3_bucket.analytics_exports.id
+}
+
+output "quality_alerts_topic" {
+  description = "SNS topic for quality alerts"
+  value       = aws_sns_topic.quality_alerts.arn
+}
+
+output "quality_dashboard_name" {
+  description = "Quality CloudWatch dashboard name"
+  value       = aws_cloudwatch_dashboard.quality.dashboard_name
+}
+
+output "quality_log_group" {
+  description = "CloudWatch log group for quality metrics"
+  value       = aws_cloudwatch_log_group.quality_metrics.name
+}
+
+output "feedback_endpoint" {
+  description = "API endpoint for user feedback"
+  value       = "${aws_api_gateway_stage.genai_knowledge_assistant.invoke_url}/feedback"
+}
+

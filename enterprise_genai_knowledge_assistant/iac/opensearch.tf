@@ -56,15 +56,25 @@ resource "aws_opensearch_domain" "vector_search" {
 }
 
 # Random password for OpenSearch master user
+# Must contain: uppercase, lowercase, number, special character
 resource "random_password" "opensearch_master_password" {
-  length  = 16
-  special = true
+  length           = 16
+  special          = true
+  override_special = "!@#$%^&*"
+  min_upper        = 1
+  min_lower        = 1
+  min_numeric      = 1
+  min_special      = 1
 }
 
 # Store OpenSearch password in AWS Secrets Manager
 resource "aws_secretsmanager_secret" "opensearch_password" {
   name                    = "${var.project_name}-opensearch-password"
-  recovery_window_in_days = 7
+  recovery_window_in_days = 0  # Force immediate deletion to allow recreation
+  
+  lifecycle {
+    create_before_destroy = false
+  }
 }
 
 resource "aws_secretsmanager_secret_version" "opensearch_password" {
