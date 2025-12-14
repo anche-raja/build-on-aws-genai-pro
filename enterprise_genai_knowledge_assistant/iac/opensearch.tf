@@ -48,6 +48,21 @@ resource "aws_opensearch_domain" "vector_search" {
         }
         Action   = "es:*"
         Resource = "arn:aws:es:${var.aws_region}:${data.aws_caller_identity.current.account_id}:domain/${var.project_name}/*"
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "*"
+        }
+        Action = [
+          "es:ESHttp*"
+        ]
+        Resource = "arn:aws:es:${var.aws_region}:${data.aws_caller_identity.current.account_id}:domain/${var.project_name}/*"
+        Condition = {
+          IpAddress = {
+            "aws:SourceIp" = ["0.0.0.0/0"]
+          }
+        }
       }
     ]
   })
@@ -85,5 +100,49 @@ resource "aws_secretsmanager_secret_version" "opensearch_password" {
     username = "admin"
     password = random_password.opensearch_master_password.result
   })
+}
+
+# Automatically configure OpenSearch role mapping for Lambda
+resource "null_resource" "configure_opensearch_role_mapping" {
+  depends_on = [
+    aws_opensearch_domain.vector_search,
+    aws_secretsmanager_secret_version.opensearch_password
+  ]
+
+  triggers = {
+    # Rerun if Lambda role changes
+    lambda_role_arn = aws_iam_role.lambda_execution_role.arn
+    # Rerun if OpenSearch endpoint changes
+    opensearch_endpoint = aws_opensearch_domain.vector_search.endpoint
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      
+      # Wait for OpenSearch to be fully ready
+      echo "Waiting for OpenSearch to be ready..."
+      sleep 30
+      
+      # Get credentials
+      USERNAME="admin"
+      PASSWORD="${random_password.opensearch_master_password.result}"
+      OPENSEARCH_ENDPOINT="${aws_opensearch_domain.vector_search.endpoint}"
+      LAMBDA_ROLE_ARN="${aws_iam_role.lambda_execution_role.arn}"
+      
+      # Configure role mapping
+      echo "Configuring OpenSearch role mapping for Lambda..."
+      curl -s -u "$USERNAME:$PASSWORD" \
+        -X PUT "https://$OPENSEARCH_ENDPOINT/_plugins/_security/api/rolesmapping/all_access" \
+        -H 'Content-Type: application/json' \
+        -d '{
+          "backend_roles": ["'"$LAMBDA_ROLE_ARN"'"],
+          "hosts": [],
+          "users": []
+        }' || echo "Role mapping may already exist or will be configured on next apply"
+      
+      echo "✅ OpenSearch role mapping configured"
+    EOT
+  }
 }
 

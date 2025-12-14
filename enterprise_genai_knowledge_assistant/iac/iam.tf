@@ -171,6 +171,13 @@ resource "aws_iam_role_policy" "services_policy" {
           "${aws_s3_bucket.audit_logs.arn}/*",
           "${aws_s3_bucket.analytics_exports.arn}/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:PutMetricData"
+        ]
+        Resource = "*"
       }
     ]
   })

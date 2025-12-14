@@ -1,32 +1,150 @@
+# Create build directory for Lambda artifacts
+resource "null_resource" "create_build_dir" {
+  provisioner "local-exec" {
+    command = "mkdir -p ${path.module}/../build"
+  }
+}
+
+# Auto-build Lambda packages with dependencies
+resource "null_resource" "build_query_handler" {
+  depends_on = [null_resource.create_build_dir]
+  triggers = {
+    # Rebuild when source code changes
+    code_hash = filemd5("${path.module}/../lambda/query_handler/app.py")
+    requirements_hash = filemd5("${path.module}/../lambda/query_handler/requirements.txt")
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      cd ${path.module}/../lambda/query_handler
+      rm -rf package
+      mkdir -p package
+      python3 -m pip install -r requirements.txt -t package/ --quiet
+      cp *.py package/
+      echo "✅ Query handler built"
+    EOT
+  }
+}
+
+resource "null_resource" "build_document_processor" {
+  depends_on = [null_resource.create_build_dir]
+  
+  triggers = {
+    code_hash = filemd5("${path.module}/../lambda/document_processor/app.py")
+    requirements_hash = filemd5("${path.module}/../lambda/document_processor/requirements.txt")
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      cd ${path.module}/../lambda/document_processor
+      rm -rf package
+      mkdir -p package
+      python3 -m pip install -r requirements.txt -t package/ --quiet
+      cp *.py package/
+      echo "✅ Document processor built"
+    EOT
+  }
+}
+
 # Data source for Lambda package archives
 data "archive_file" "document_processor" {
+  depends_on = [null_resource.build_document_processor]
   type        = "zip"
   source_dir  = "${path.module}/../lambda/document_processor/package"
-  output_path = "${path.module}/lambda_document_processor.zip"
+  output_path = "${path.module}/../build/lambda_document_processor.zip"
 }
 
 data "archive_file" "query_handler" {
+  depends_on = [null_resource.build_query_handler]
   type        = "zip"
   source_dir  = "${path.module}/../lambda/query_handler/package"
-  output_path = "${path.module}/lambda_query_handler.zip"
+  output_path = "${path.module}/../build/lambda_query_handler.zip"
+}
+
+resource "null_resource" "build_quality_reporter" {
+  depends_on = [null_resource.create_build_dir]
+  
+  triggers = {
+    code_hash = filemd5("${path.module}/../lambda/quality_reporter/app.py")
+    requirements_hash = filemd5("${path.module}/../lambda/quality_reporter/requirements.txt")
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      cd ${path.module}/../lambda/quality_reporter
+      rm -rf package
+      mkdir -p package
+      python3 -m pip install -r requirements.txt -t package/ --quiet
+      cp *.py package/
+      echo "✅ Quality reporter built"
+    EOT
+  }
+}
+
+resource "null_resource" "build_analytics_exporter" {
+  depends_on = [null_resource.create_build_dir]
+  
+  triggers = {
+    code_hash = filemd5("${path.module}/../lambda/analytics_exporter/app.py")
+    requirements_hash = filemd5("${path.module}/../lambda/analytics_exporter/requirements.txt")
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      cd ${path.module}/../lambda/analytics_exporter
+      rm -rf package
+      mkdir -p package
+      python3 -m pip install -r requirements.txt -t package/ --quiet
+      cp *.py package/
+      echo "✅ Analytics exporter built"
+    EOT
+  }
+}
+
+resource "null_resource" "build_audit_exporter" {
+  depends_on = [null_resource.create_build_dir]
+  
+  triggers = {
+    code_hash = filemd5("${path.module}/../lambda/audit_exporter/app.py")
+    requirements_hash = filemd5("${path.module}/../lambda/audit_exporter/requirements.txt")
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      cd ${path.module}/../lambda/audit_exporter
+      rm -rf package
+      mkdir -p package
+      python3 -m pip install -r requirements.txt -t package/ --quiet
+      cp *.py package/
+      echo "✅ Audit exporter built"
+    EOT
+  }
 }
 
 data "archive_file" "quality_reporter" {
+  depends_on = [null_resource.build_quality_reporter]
   type        = "zip"
   source_dir  = "${path.module}/../lambda/quality_reporter/package"
-  output_path = "${path.module}/lambda_quality_reporter.zip"
+  output_path = "${path.module}/../build/lambda_quality_reporter.zip"
 }
 
 data "archive_file" "analytics_exporter" {
+  depends_on = [null_resource.build_analytics_exporter]
   type        = "zip"
   source_dir  = "${path.module}/../lambda/analytics_exporter/package"
-  output_path = "${path.module}/lambda_analytics_exporter.zip"
+  output_path = "${path.module}/../build/lambda_analytics_exporter.zip"
 }
 
 data "archive_file" "audit_exporter" {
+  depends_on = [null_resource.build_audit_exporter]
   type        = "zip"
   source_dir  = "${path.module}/../lambda/audit_exporter/package"
-  output_path = "${path.module}/lambda_audit_exporter.zip"
+  output_path = "${path.module}/../build/lambda_audit_exporter.zip"
 }
 
 # CloudWatch Log Groups

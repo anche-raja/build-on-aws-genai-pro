@@ -86,28 +86,28 @@ AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
 # Initialize tokenizer for token counting
 tokenizer = tiktoken.get_encoding("cl100k_base") if tiktoken else None
 
-# Define model configurations
+# Define model configurations (Updated to current Bedrock model IDs)
 models = {
     "simple": {
-        "id": "anthropic.claude-instant-v1",
-        "max_tokens": 500,
+        "id": "anthropic.claude-3-haiku-20240307-v1:0",
+        "max_tokens": 1000,
         "temperature": 0.2,
-        "cost_per_1k_input": 0.00080,
-        "cost_per_1k_output": 0.00240
+        "cost_per_1k_input": 0.00025,
+        "cost_per_1k_output": 0.00125
     },
     "standard": {
-        "id": "anthropic.claude-v2:1",
-        "max_tokens": 1000,
+        "id": "anthropic.claude-3-sonnet-20240229-v1:0",
+        "max_tokens": 2000,
         "temperature": 0.7,
         "cost_per_1k_input": 0.00800,
         "cost_per_1k_output": 0.02400
     },
     "advanced": {
-        "id": "anthropic.claude-3-sonnet-20240229-v1:0",
-        "max_tokens": 2000,
+        "id": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+        "max_tokens": 4000,
         "temperature": 0.7,
-        "cost_per_1k_input": 0.01500,
-        "cost_per_1k_output": 0.06000
+        "cost_per_1k_input": 0.00300,
+        "cost_per_1k_output": 0.01500
     }
 }
 
