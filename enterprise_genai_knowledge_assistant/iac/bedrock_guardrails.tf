@@ -53,25 +53,25 @@ resource "aws_bedrock_guardrail" "content_safety" {
 
   # Sensitive Information Policy - PII protection
   sensitive_information_policy_config {
-    # Email addresses - ANONYMIZE instead of BLOCK for resume content
+    # Email addresses
     pii_entities_config {
       action = "ANONYMIZE"
       type   = "EMAIL"
     }
 
-    # Phone numbers - ANONYMIZE instead of BLOCK for resume content
+    # Phone numbers
     pii_entities_config {
       action = "ANONYMIZE"
       type   = "PHONE"
     }
 
-    # Social Security Numbers - Keep BLOCK (truly sensitive)
+    # Social Security Numbers
     pii_entities_config {
       action = "BLOCK"
       type   = "US_SOCIAL_SECURITY_NUMBER"
     }
 
-    # Credit card numbers - Keep BLOCK (truly sensitive)
+    # Credit card numbers
     pii_entities_config {
       action = "BLOCK"
       type   = "CREDIT_DEBIT_CARD_NUMBER"

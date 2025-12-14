@@ -207,8 +207,8 @@ resource "aws_lambda_function" "query_handler" {
       OPENSEARCH_SECRET   = aws_secretsmanager_secret.opensearch_password.name
       EVALUATION_TABLE    = aws_dynamodb_table.evaluation_table.name
       AUDIT_TRAIL_TABLE   = aws_dynamodb_table.audit_trail.name
-      GUARDRAIL_ID        = aws_bedrock_guardrail.content_safety.guardrail_id
-      GUARDRAIL_VERSION   = "DRAFT"
+      # GUARDRAIL_ID        = aws_bedrock_guardrail.content_safety.guardrail_id  # Temporarily disabled for testing
+      # GUARDRAIL_VERSION   = "DRAFT"
       COMPLIANCE_SNS      = aws_sns_topic.compliance_alerts.arn
       AUDIT_LOGS_BUCKET   = aws_s3_bucket.audit_logs.id
       USER_FEEDBACK_TABLE = aws_dynamodb_table.user_feedback.name
