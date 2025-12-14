@@ -12,15 +12,15 @@ Production-ready RAG-based knowledge assistant on AWS with intelligent model rou
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                         WEB APPLICATION (React)                              │
-│  • Chat Interface  • Document Upload  • Analytics  • Admin Dashboard       │
-│  • Cognito Auth   • S3/CloudFront Hosting                                  │
+│                         WEB APPLICATION (React)                             │
+│  • Chat Interface  • Document Upload  • Analytics  • Admin Dashboard        │
+│  • Cognito Auth   • S3/CloudFront Hosting                                   │
 └──────────────────────────────────┬──────────────────────────────────────────┘
                                    │
                                    ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                    API GATEWAY (REST + CloudFront CDN)                       │
-│  Endpoints: /documents, /query, /feedback                                  │
+│                    API GATEWAY (REST + CloudFront CDN)                      │
+│  Endpoints: /documents, /query, /feedback                                   │
 └──────────────────────┬────────────────────────┬─────────────────────────────┘
                        │                        │
            ┌───────────▼──────────┐  ┌─────────▼──────────┐
@@ -49,23 +49,23 @@ Production-ready RAG-based knowledge assistant on AWS with intelligent model rou
 │   DOCUMENT PROCESSING PIPELINE      │ │   QUERY PROCESSING PIPELINE        │
 │   (NO Security Checks)              │ │   (WITH Security Checks)           │
 │                                     │ │                                    │
-│  S3 → Chunking → Embeddings (Titan)│ │  Cache Check → Hybrid Search       │
+│  S3 → Chunking → Embeddings (Titan) | │  Cache Check → Hybrid Search       │
 │  → OpenSearch → DynamoDB            │ │  → Re-ranking → Model Selection    │
 │                                     │ │  → Bedrock → Validation → Store    │
 └─────────────────────────────────────┘ └────────────────────────────────────┘
                                    │
                                    ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                         STORAGE & DATA LAYER                                 │
-│  • DynamoDB: Metadata, Conversations, Evaluations, Audit Trail, Feedback   │
+│                         STORAGE & DATA LAYER                                │
+│  • DynamoDB: Metadata, Conversations, Evaluations, Audit Trail, Feedback    │
 │  • S3: Documents, Audit Archives, Analytics Exports                         │
 │  • OpenSearch: Vector embeddings, KNN search                                │
 └─────────────────────────────────────────────────────────────────────────────┘
                                    │
                                    ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                     MONITORING & SCHEDULED TASKS                             │
-│  • CloudWatch: Logs, Metrics (custom), Dashboards (3), Alarms (6)          │
+│                     MONITORING & SCHEDULED TASKS                            │
+│  • CloudWatch: Logs, Metrics (custom), Dashboards (3), Alarms (6)           │
 │  • SNS: Compliance & Quality Alerts                                         │
 │  • EventBridge: quality_reporter, analytics_exporter, audit_exporter        │
 └─────────────────────────────────────────────────────────────────────────────┘
