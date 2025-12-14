@@ -19,6 +19,12 @@ const awsconfig = {
       }
     }
   },
+  Storage: {
+    S3: {
+      bucket: process.env.REACT_APP_DOCUMENTS_BUCKET || 'gka-documents-284244381060',
+      region: process.env.REACT_APP_AWS_REGION || 'us-east-1'
+    }
+  },
   API: {
     REST: {
       GenAIAPI: {

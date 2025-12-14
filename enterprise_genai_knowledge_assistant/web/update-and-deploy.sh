@@ -6,6 +6,8 @@ cat > .env <<EOF
 REACT_APP_AWS_REGION=us-east-1
 REACT_APP_USER_POOL_ID=us-east-1_R7F730slC
 REACT_APP_USER_POOL_CLIENT_ID=489km24v70ugekj8cr5pt43u38
+REACT_APP_IDENTITY_POOL_ID=us-east-1:bfd53e16-dc6b-4c7d-b60d-0e8f9e19be81
+REACT_APP_DOCUMENTS_BUCKET=gka-documents-284244381060
 REACT_APP_API_ENDPOINT=https://3chov1t2di.execute-api.us-east-1.amazonaws.com/prod
 EOF
 

@@ -171,13 +171,13 @@ resource "aws_cloudwatch_event_rule" "daily_audit_export" {
   }
 }
 
-# Lambda for Audit Export (placeholder - would need implementation)
+# Lambda for Audit Export
 resource "aws_lambda_function" "audit_exporter" {
-  filename         = data.archive_file.query_handler.output_path  # Reuse for now
+  filename         = data.archive_file.audit_exporter.output_path
   function_name    = "${var.project_name}-audit-exporter"
   role             = aws_iam_role.lambda_execution_role.arn
-  handler          = "governance_handler.export_handler"
-  source_code_hash = data.archive_file.query_handler.output_base64sha256
+  handler          = "app.handler"
+  source_code_hash = data.archive_file.audit_exporter.output_base64sha256
   runtime          = "python3.10"
   timeout          = 300
   memory_size      = 512

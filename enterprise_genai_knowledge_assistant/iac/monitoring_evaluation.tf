@@ -325,11 +325,11 @@ resource "aws_cloudwatch_event_rule" "weekly_analytics_export" {
 
 # Lambda for Quality Report Generation
 resource "aws_lambda_function" "quality_reporter" {
-  filename         = data.archive_file.query_handler.output_path
+  filename         = data.archive_file.quality_reporter.output_path
   function_name    = "${var.project_name}-quality-reporter"
   role             = aws_iam_role.lambda_execution_role.arn
-  handler          = "quality_reporter.handler"
-  source_code_hash = data.archive_file.query_handler.output_base64sha256
+  handler          = "app.handler"
+  source_code_hash = data.archive_file.quality_reporter.output_base64sha256
   runtime          = "python3.10"
   timeout          = 300
   memory_size      = 512
@@ -365,11 +365,11 @@ resource "aws_lambda_permission" "allow_eventbridge_quality_report" {
 
 # Lambda for Analytics Export
 resource "aws_lambda_function" "analytics_exporter" {
-  filename         = data.archive_file.query_handler.output_path
+  filename         = data.archive_file.analytics_exporter.output_path
   function_name    = "${var.project_name}-analytics-exporter"
   role             = aws_iam_role.lambda_execution_role.arn
-  handler          = "analytics_exporter.handler"
-  source_code_hash = data.archive_file.query_handler.output_base64sha256
+  handler          = "app.handler"
+  source_code_hash = data.archive_file.analytics_exporter.output_base64sha256
   runtime          = "python3.10"
   timeout          = 600
   memory_size      = 1024

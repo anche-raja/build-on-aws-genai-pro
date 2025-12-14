@@ -25,6 +25,7 @@ import {
   CheckCircle as SuccessIcon,
 } from '@mui/icons-material';
 import { post } from 'aws-amplify/api';
+import { uploadData } from 'aws-amplify/storage';
 
 export default function DocumentUpload({ user }) {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -60,60 +61,69 @@ export default function DocumentUpload({ user }) {
     setUploadProgress(0);
 
     try {
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
+      // Step 1: Upload file to S3
+      const userEmail = user?.signInDetails?.loginId || 'anonymous';
+      const timestamp = Date.now();
+      const s3Key = `uploads/${userEmail}/${timestamp}-${selectedFile.name}`;
+      
+      console.log('Uploading file to S3:', s3Key);
+      setUploadProgress(30);
+
+      // Upload to S3 using Amplify Storage
+      const uploadResult = await uploadData({
+        key: s3Key,
+        data: selectedFile,
+        options: {
+          contentType: selectedFile.type || 'application/octet-stream',
+          onProgress: ({ transferredBytes, totalBytes }) => {
+            if (totalBytes) {
+              const progress = Math.round((transferredBytes / totalBytes) * 60) + 30; // 30-90%
+              setUploadProgress(progress);
+            }
           }
-          return prev + 10;
-        });
-      }, 200);
+        }
+      }).result;
 
-      // In a real implementation, you would:
-      // 1. Upload file to S3
-      // 2. Call the document processor API
+      console.log('File uploaded successfully:', uploadResult);
+      setUploadProgress(90);
 
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const content = e.target.result;
-
-        // Call document processor API
-        await post({
-          apiName: 'GenAIAPI',
-          path: '/documents',
-          options: {
-            body: {
-              document_key: `uploads/${user?.signInDetails?.loginId}/${selectedFile.name}`,
-              document_type: documentType,
-              // In production, you'd upload to S3 first and pass the key
-            },
+      // Step 2: Call document processor API
+      const response = await post({
+        apiName: 'GenAIAPI',
+        path: '/documents',
+        options: {
+          body: {
+            document_key: s3Key,
+            document_type: documentType,
           },
-        });
+        },
+      });
 
-        clearInterval(progressInterval);
-        setUploadProgress(100);
-        setSuccess(true);
-        setUploadedDocs((prev) => [
-          ...prev,
-          {
-            name: selectedFile.name,
-            type: documentType,
-            timestamp: new Date(),
-          },
-        ]);
-        setTimeout(() => {
-          setSelectedFile(null);
-          setUploadProgress(0);
-          setSuccess(false);
-        }, 2000);
-      };
+      console.log('Document processing initiated:', response);
+      setUploadProgress(100);
+      setSuccess(true);
+      
+      // Add to uploaded documents list
+      setUploadedDocs((prev) => [
+        ...prev,
+        {
+          name: selectedFile.name,
+          type: documentType,
+          timestamp: new Date(),
+          s3Key: s3Key,
+        },
+      ]);
 
-      reader.readAsText(selectedFile);
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setSelectedFile(null);
+        setUploadProgress(0);
+        setSuccess(false);
+      }, 2000);
+
     } catch (err) {
       console.error('Upload error:', err);
-      setError('Failed to upload document. Please try again.');
+      setError(`Failed to upload document: ${err.message || 'Unknown error'}. Please try again.`);
       setUploadProgress(0);
     } finally {
       setUploading(false);

@@ -1,772 +1,474 @@
-# 🚀 Enterprise GenAI Knowledge Assistant
+# Enterprise GenAI Knowledge Assistant
 
-A complete, production-ready, enterprise-grade AI-powered knowledge management system built on AWS with comprehensive safety, governance, and monitoring capabilities.
-
----
-
-## ✨ **Key Features**
-
-- 🔍 **Advanced RAG System** - Hybrid search (semantic + keyword) with intelligent re-ranking
-- 🤖 **Multi-Model AI** - Dynamic model selection across 3 Claude tiers for cost optimization
-- 🛡️ **Enterprise Safety** - Bedrock Guardrails + PII detection and redaction
-- 📊 **Real-Time Monitoring** - 3 CloudWatch dashboards with comprehensive metrics
-- 👍 **Quality Evaluation** - 6-dimensional automated quality scoring
-- 💬 **Modern Web Interface** - React-based UI with authentication
-- 📈 **Cost Optimized** - ~$0.00357 per query with intelligent caching
+Production-ready enterprise knowledge assistant built with Amazon Bedrock, OpenSearch, and AWS serverless technologies. Features intelligent RAG, multi-tier model selection, content safety guardrails, and comprehensive monitoring.
 
 ---
 
-## 🏗️ **Architecture Overview**
+## ✨ Features
 
-```
-User → CloudFront → React App → Cognito Auth →
-API Gateway → Lambda Functions →
-├─ Safety Layer (Guardrails + PII) →
-├─ Document Processing (Chunking + Embeddings) →
-├─ Vector Search (OpenSearch + Hybrid) →
-├─ Model Selection (3-tier) →
-├─ Response Generation (Bedrock) →
-├─ Quality Evaluation (6 dimensions) →
-└─ Monitoring (CloudWatch + Audit)
-```
+- 🔍 **Intelligent RAG** - Hybrid search (vector + keyword) with semantic retrieval
+- 🤖 **Multi-Tier Models** - Dynamic model selection (Simple/Standard/Advanced) based on query complexity
+- 🛡️ **Content Safety** - PII detection, redaction, and Bedrock guardrails
+- 📊 **Monitoring & Analytics** - Quality metrics, user feedback, and performance tracking
+- 🔐 **Governance & Compliance** - Comprehensive audit trails and compliance reporting
+- 💬 **Web Interface** - Modern React UI with real-time chat and document upload
+- 📈 **Cost Optimization** - Smart caching and intelligent model tier selection
 
 ---
 
-## 📋 **All 7 Phases**
+## 🚀 Quick Start
 
-| Phase | Description | Status | Cost |
-|-------|-------------|--------|------|
-| **[Phase 1](#phase-1-core-infrastructure)** | Infrastructure & API | ✅ Complete | ~$250/mo |
-| **[Phase 2](#phase-2-document-processing)** | Document Processing | ✅ Complete | Included |
-| **[Phase 3](#phase-3-rag-system)** | RAG System | ✅ Complete | Included |
-| **[Phase 4](#phase-4-model-optimization)** | Model Selection & Optimization | ✅ Complete | ~$86/mo |
-| **[Phase 5](#phase-5-safety--governance)** | Safety & Governance | ✅ Complete | ~$3/mo |
-| **[Phase 6](#phase-6-monitoring--evaluation)** | Monitoring & Evaluation | ✅ Complete | ~$17/mo |
-| **[Phase 7](#phase-7-web-interface)** | Web Interface | ✅ Complete | ~$1/mo |
-| **Total** | **Complete System** | **✅ Ready** | **~$357/mo** |
+### Prerequisites
 
----
-
-## 🚀 **Quick Start**
-
-### **Prerequisites:**
-```bash
-- AWS Account
+- AWS Account with appropriate permissions
 - Terraform >= 1.0
-- AWS CLI >= 2.0
-- Node.js >= 18.x (for web interface)
-- Python >= 3.10
-```
+- Python 3.10+
+- Node.js 18+ (for web interface)
+- AWS CLI configured
+- Amazon Bedrock model access enabled (Claude, Titan)
 
-### **1. Deploy Infrastructure (15 minutes):**
+### 1. Enable Bedrock Models
 
 ```bash
-cd enterprise_genai_knowledge_assistant/iac
+# Go to AWS Console → Amazon Bedrock → Model access
+# Enable: Claude 3 Sonnet, Claude 2.1, Claude Instant, Titan Embeddings
+```
 
-# Initialize
+### 2. Deploy Infrastructure
+
+```bash
+cd iac
 terraform init
-
-# Deploy
-terraform apply -auto-approve
-
-# Save outputs
-terraform output > ../terraform-outputs.txt
+terraform apply
 ```
 
-### **2. Enable Bedrock Models:**
+**Deployment time:** ~20-30 minutes (OpenSearch takes longest)
+
+**Resources created:**
+- 5 Lambda functions (document processor, query handler, 3 scheduled tasks)
+- OpenSearch domain for vector search
+- 6 DynamoDB tables (metadata, conversations, evaluations, audit trail, feedback, quality metrics)
+- 3 S3 buckets (documents, audit logs, analytics exports)
+- API Gateway REST API
+- Bedrock guardrails and SNS alerts
+- CloudWatch dashboards and alarms
+- Cognito user pool and identity pool
+- CloudFront distribution (web app CDN)
+
+### 3. Build and Deploy Lambda Functions
 
 ```bash
-# AWS Console → Bedrock → Model access
-# Enable:
-# - Amazon Titan Embeddings
-# - Claude Instant
-# - Claude 2.1
-# - Claude 3 Sonnet
+# From project root
+./build-lambda.sh
+
+# Deploy via Terraform
+cd iac
+terraform apply
+
+# OR update individual functions via AWS CLI
+cd lambda/<function-name>/package
+zip -r ../deploy.zip .
+aws lambda update-function-code \
+  --function-name gka-<function-name> \
+  --zip-file fileb://../deploy.zip
 ```
 
-### **3. Deploy Web Interface:**
+### 4. Deploy Web Interface
 
 ```bash
+# Get Terraform outputs
+cd iac
+terraform output
+
+# Update web app configuration
 cd ../web
-
-# Configure
-cat > .env <<EOF
-REACT_APP_AWS_REGION=us-east-1
-REACT_APP_USER_POOL_ID=$(cd ../iac && terraform output -raw cognito_user_pool_id)
-REACT_APP_USER_POOL_CLIENT_ID=$(cd ../iac && terraform output -raw cognito_user_pool_client_id)
-REACT_APP_API_ENDPOINT=$(cd ../iac && terraform output -raw api_url)
-EOF
+# Edit src/aws-exports.js with Cognito and API Gateway URLs
 
 # Install and build
 npm install
 npm run build
 
-# Deploy to S3
-BUCKET=$(cd ../iac && terraform output -raw s3_website_bucket)
-aws s3 sync build/ s3://${BUCKET}/ --delete
+# Deploy (Option A: using provided script)
+./update-and-deploy.sh
+
+# Deploy (Option B: to S3+CloudFront)
+aws s3 sync build/ s3://gka-amplify-deployment-<account-id>/
 ```
 
-### **4. Create First User:**
+### 5. Create Users and Test
 
 ```bash
+# Create Cognito user
 USER_POOL_ID=$(cd iac && terraform output -raw cognito_user_pool_id)
-
 aws cognito-idp admin-create-user \
-  --user-pool-id ${USER_POOL_ID} \
+  --user-pool-id $USER_POOL_ID \
   --username admin@example.com \
   --user-attributes Name=email,Value=admin@example.com
-```
 
-### **5. Access the App:**
-
-```bash
-# Get web URL
-cd iac
-terraform output web_app_url
-
-# Example: https://d123456789.cloudfront.net
-```
-
-**Total Setup Time:** ~20 minutes ⏱️
-
----
-
-## 📚 **Phase Details**
-
-### **Phase 1: Core Infrastructure**
-
-**What it does:**
-- Sets up API Gateway, Lambda, S3, OpenSearch, DynamoDB
-- Configures IAM roles and security
-- Enables CloudWatch monitoring
-
-**Key Resources:**
-- API Gateway REST API with 3 endpoints
-- 2 Lambda functions (Document Processor, Query Handler)
-- S3 bucket for document storage
-- OpenSearch cluster (2x r6g.large.search)
-- 3 DynamoDB tables (metadata, conversations, evaluation)
-
-**Documentation:**
-- [PHASE1_INFRASTRUCTURE_ARCHITECTURE.md](PHASE1_INFRASTRUCTURE_ARCHITECTURE.md) - Architecture details
-- [PHASE1_README.md](PHASE1_README.md) - Usage guide
-
----
-
-### **Phase 2: Document Processing**
-
-**What it does:**
-- Ingests documents from S3
-- Applies dynamic semantic chunking (paragraph-based, 1000 tokens max)
-- Generates embeddings using Amazon Titan
-- Indexes chunks in OpenSearch with KNN
-- Stores metadata in DynamoDB
-
-**Key Features:**
-- Semantic chunking preserves context
-- Token counting with tiktoken
-- Parallel embedding generation
-- Bulk OpenSearch indexing
-
-**Documentation:**
-- [PHASE2_DOCUMENT_PROCESSING_ARCHITECTURE.md](PHASE2_DOCUMENT_PROCESSING_ARCHITECTURE.md) - Architecture details
-- [PHASE2_README.md](PHASE2_README.md) - Usage guide
-
----
-
-### **Phase 3: RAG System**
-
-**What it does:**
-- **Vector Search:** Semantic similarity using KNN
-- **Keyword Search:** BM25 lexical matching
-- **Hybrid Fusion:** 70% vector + 30% keyword
-- **Re-ranking:** Quality-based optimization
-- **Context Optimization:** Token budget management
-- **Dynamic Prompts:** Adaptive construction with history
-
-**Key Metrics:**
-- Hybrid Search Precision@5: 91%
-- Average latency: 1.2s
-- Response quality: 85%
-
-**Documentation:**
-- [PHASE3_RAG_ARCHITECTURE.md](PHASE3_RAG_ARCHITECTURE.md) - Architecture details
-- [PHASE3_README.md](PHASE3_README.md) - Usage guide
-
----
-
-### **Phase 4: Model Optimization**
-
-**What it does:**
-- **3-Tier Model Selection:** Simple, Standard, Advanced
-- **Query Complexity Analysis:** Automatic tier selection
-- **Caching:** 1-hour TTL (30-40% cost reduction)
-- **Fallback Mechanisms:** Model chain for high availability
-- **Cost Tracking:** Real-time per-query cost calculation
-
-**Model Distribution:**
-- Simple (Claude Instant): 70% of queries
-- Standard (Claude 2.1): 25% of queries
-- Advanced (Claude 3 Sonnet): 5% of queries
-
-**Documentation:**
-- [PHASE4_MODEL_SELECTION_OPTIMIZATION.md](PHASE4_MODEL_SELECTION_OPTIMIZATION.md)
-
----
-
-### **Phase 5: Safety & Governance**
-
-**What it does:**
-- **Bedrock Guardrails:** Content filtering, PII protection, topic restrictions
-- **PII Detection:** AWS Comprehend (20+ types)
-- **Audit Trails:** 7-year retention for compliance
-- **Compliance Logging:** 3-tier system (DynamoDB + CloudWatch + S3)
-- **Governance Dashboard:** Real-time safety monitoring
-
-**Compliance:**
-- SOC 2 Type II ready
-- HIPAA compatible
-- GDPR compliant
-- ISO 27001 aligned
-
-**Documentation:**
-- [PHASE5_SAFETY_GOVERNANCE.md](PHASE5_SAFETY_GOVERNANCE.md) - Comprehensive guide (40+ pages)
-- [PHASE5_SUMMARY.md](PHASE5_SUMMARY.md) - Quick reference
-- [PHASE5_VISUAL_SUMMARY.md](PHASE5_VISUAL_SUMMARY.md) - Visual diagrams
-
----
-
-### **Phase 6: Monitoring & Evaluation**
-
-**What it does:**
-- **Quality Evaluation:** 6-dimensional automated scoring
-- **User Feedback:** Thumbs up/down, ratings, comments
-- **Performance Metrics:** Latency, cost, cache hit rate
-- **Advanced Dashboards:** 3 dashboards with 25+ widgets
-- **Comprehensive Alerting:** 10 CloudWatch alarms
-- **Automated Reporting:** Daily quality reports + weekly exports
-
-**Quality Dimensions:**
-- Relevance (25%), Coherence (15%), Completeness (20%)
-- Accuracy (20%), Conciseness (10%), Groundedness (10%)
-
-**Documentation:**
-- [PHASE6_MONITORING_EVALUATION.md](PHASE6_MONITORING_EVALUATION.md)
-- [PHASE6_SUMMARY.md](PHASE6_SUMMARY.md)
-
----
-
-### **Phase 7: Web Interface**
-
-**What it does:**
-- **React Frontend:** Modern, responsive UI
-- **AWS Cognito:** Secure authentication
-- **Chat Interface:** Real-time conversations with quality metrics
-- **Feedback Collection:** In-app submission
-- **Admin Dashboard:** Metrics visualization with charts
-- **CloudFront CDN:** Global content delivery
-
-**Pages:**
-- Chat, Documents, Admin Dashboard, Analytics, Settings
-
-**Documentation:**
-- [PHASE7_WEB_INTERFACE.md](PHASE7_WEB_INTERFACE.md)
-- [web/README.md](web/README.md)
-
----
-
-## 💰 **Cost Breakdown**
-
-### **Monthly Costs (100K queries):**
-
-| Service | Configuration | Cost |
-|---------|--------------|------|
-| **OpenSearch** | 2x r6g.large.search | $250 |
-| **Bedrock** | Models (100K queries) | $86 |
-| **Lambda** | 100K invocations | $20 |
-| **CloudWatch** | Metrics + logs | $17 |
-| **DynamoDB** | On-demand (7 tables) | $7 |
-| **API Gateway** | 100K requests | $3.50 |
-| **Guardrails** | 100K requests | $3 |
-| **CloudFront** | 10 GB transfer | $1 |
-| **S3** | Storage + requests | $0.30 |
-| **Cognito** | < 50K MAU | $0 |
-| **Total** | | **$357/mo** |
-
-**Per Query:** ~$0.00357  
-**Cost Optimization:** 60% savings via model tiering + caching
-
----
-
-## 🎯 **Use Cases**
-
-### **1. Internal Knowledge Base**
-- Company wikis and documentation
-- Policy and procedure search
-- Training material access
-- Employee self-service
-
-### **2. Customer Support**
-- FAQ automation
-- Product documentation
-- Troubleshooting guides
-- 24/7 AI support
-
-### **3. Research & Analysis**
-- Academic literature search
-- Market research
-- Competitive analysis
-- Document summarization
-
-### **4. Compliance & Legal**
-- Policy compliance checking
-- Contract analysis
-- Regulatory documentation
-- Audit trail management
-
----
-
-## 📊 **Performance**
-
-### **Latency:**
-- Document processing: 700ms (10 KB doc)
-- Query (cached): < 100ms
-- Query (uncached): 1.2s average
-- P95 latency: 1.5s
-- P99 latency: 2.5s
-
-### **Accuracy:**
-- Hybrid search precision: 91%
-- Response quality: 85%
-- User satisfaction: 80%+
-
-### **Scalability:**
-- Throughput: 1000s queries/second
-- Concurrent users: Unlimited
-- Document capacity: Millions
-- Auto-scaling: All components
-
----
-
-## 🔒 **Security**
-
-### **Data Protection:**
-- ✅ Encryption at rest (all services)
-- ✅ Encryption in transit (TLS 1.2+)
-- ✅ PII detection and redaction
-- ✅ Content filtering (Bedrock Guardrails)
-
-### **Access Control:**
-- ✅ AWS Cognito authentication
-- ✅ IAM-based authorization
-- ✅ API Gateway throttling
-- ✅ Least privilege IAM roles
-
-### **Compliance:**
-- ✅ 7-year audit retention
-- ✅ SOC 2, HIPAA, GDPR, ISO 27001 ready
-- ✅ Point-in-time recovery
-- ✅ Automated compliance reports
-
-### **Monitoring:**
-- ✅ Real-time dashboards
-- ✅ Automated security alerts
-- ✅ Comprehensive audit trail
-- ✅ PII detection logging
-
----
-
-## 📚 **Documentation**
-
-### **Phase Documentation:**
-1. [PHASE1_INFRASTRUCTURE_ARCHITECTURE.md](PHASE1_INFRASTRUCTURE_ARCHITECTURE.md) - Infrastructure details
-2. [PHASE1_README.md](PHASE1_README.md) - Phase 1 usage guide
-3. [PHASE2_DOCUMENT_PROCESSING_ARCHITECTURE.md](PHASE2_DOCUMENT_PROCESSING_ARCHITECTURE.md) - Document processing details
-4. [PHASE2_README.md](PHASE2_README.md) - Phase 2 usage guide
-5. [PHASE3_RAG_ARCHITECTURE.md](PHASE3_RAG_ARCHITECTURE.md) - RAG system deep dive
-6. [PHASE3_README.md](PHASE3_README.md) - Phase 3 usage guide
-7. [PHASE4_MODEL_SELECTION_OPTIMIZATION.md](PHASE4_MODEL_SELECTION_OPTIMIZATION.md) - Model optimization
-8. [PHASE5_SAFETY_GOVERNANCE.md](PHASE5_SAFETY_GOVERNANCE.md) - Safety & governance (40+ pages)
-9. [PHASE6_MONITORING_EVALUATION.md](PHASE6_MONITORING_EVALUATION.md) - Monitoring & evaluation
-10. [PHASE7_WEB_INTERFACE.md](PHASE7_WEB_INTERFACE.md) - Web interface guide
-
-### **Architecture Documentation:**
-11. [COMPLETE_ARCHITECTURE.md](COMPLETE_ARCHITECTURE.md) - Full system architecture
-12. [PROJECT_COMPLETE.md](PROJECT_COMPLETE.md) - Complete project overview
-13. [ALL_PHASES_COMPLETE.md](ALL_PHASES_COMPLETE.md) - All phases summary
-
-### **Quick References:**
-14. [PHASE5_SUMMARY.md](PHASE5_SUMMARY.md) - Phase 5 quick ref
-15. [PHASE6_SUMMARY.md](PHASE6_SUMMARY.md) - Phase 6 quick ref
-16. [web/README.md](web/README.md) - Web app documentation
-
----
-
-## 🎯 **API Endpoints**
-
-### **1. Document Upload**
-```bash
-POST /documents
-{
-  "document_key": "docs/my-file.txt",
-  "document_type": "text|pdf"
-}
-
-Response:
-{
-  "document_id": "uuid",
-  "chunk_count": 8,
-  "total_tokens": 6500
-}
-```
-
-### **2. Query**
-```bash
-POST /query
-{
-  "query": "What is AWS Lambda?",
-  "user_id": "user@example.com",
-  "conversation_id": "uuid" (optional)
-}
-
-Response:
-{
-  "request_id": "uuid",
-  "response": "AWS Lambda is...",
-  "quality_scores": {
-    "relevance": 0.92,
-    "coherence": 0.85,
-    "overall": 0.88
-  },
-  "latency": 1.234,
-  "cost": 0.015,
-  "sources": [...]
-}
-```
-
-### **3. Feedback**
-```bash
-POST /feedback
-{
-  "request_id": "uuid",
-  "user_id": "user@example.com",
-  "feedback_type": "thumbs_up|rating",
-  "rating": 5 (optional),
-  "comment": "text" (optional)
-}
-
-Response:
-{
-  "message": "Feedback received",
-  "feedback_id": "uuid"
-}
+# Get web app URL
+WEB_URL=$(cd iac && terraform output -raw web_app_url)
+echo "Web App: $WEB_URL"
+
+# Open and test
+# 1. Sign up / Log in
+# 2. Upload a test document
+# 3. Wait for processing (~10-30 seconds)
+# 4. Query the knowledge base
 ```
 
 ---
 
-## 🧪 **Testing**
+## 📚 Documentation
 
-### **End-to-End Test:**
+| Document | Description |
+|----------|-------------|
+| **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Complete system architecture, data flows, components, and cost breakdown |
+| **[DEPLOYMENT.md](./DEPLOYMENT.md)** | Detailed deployment guide with step-by-step instructions |
+| **[OPERATIONS.md](./OPERATIONS.md)** | Monitoring, testing, troubleshooting, and maintenance guide |
 
+---
+
+## 🏗️ Architecture Overview
+
+```
+Web App (React + Cognito) 
+    ↓
+API Gateway + CloudFront
+    ↓
+Lambda Functions (5)
+    ├─ document_processor → S3 → Chunking → Embeddings → OpenSearch
+    ├─ query_handler → Guardrails → PII Detection → RAG → Bedrock → Cache
+    ├─ quality_reporter → Daily quality reports → S3
+    ├─ analytics_exporter → Weekly analytics → S3
+    └─ audit_exporter → Daily audit archival → S3
+    ↓
+Storage Layer
+    ├─ OpenSearch (vector search)
+    ├─ DynamoDB (6 tables)
+    └─ S3 (3 buckets)
+    ↓
+Monitoring Layer
+    ├─ CloudWatch (logs, metrics, dashboards, alarms)
+    └─ SNS (alerts)
+```
+
+**See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed diagrams and flows.**
+
+---
+
+## 💻 Usage
+
+### Upload Documents
+
+**Via Web UI:**
+```
+Open web app → Document Upload → Select file → Upload
+```
+
+**Via API:**
 ```bash
-cd enterprise_genai_knowledge_assistant
+API_URL=$(cd iac && terraform output -raw api_gateway_url)
 
-# 1. Upload a document
-cat > test-doc.txt <<EOF
-AWS Lambda is a serverless compute service.
-It lets you run code without provisioning servers.
-You pay only for the compute time you consume.
-EOF
-
-aws s3 cp test-doc.txt s3://gka-documents-123456/test/
-
-# 2. Process the document
-API_URL=$(cd iac && terraform output -raw api_url)
-
-curl -X POST "${API_URL}/documents" \
-  -H 'Content-Type: application/json' \
+curl -X POST ${API_URL}/documents \
+  -H "Content-Type: application/json" \
   -d '{
-    "document_key": "test/test-doc.txt",
-    "document_type": "text"
+    "document_key": "my-document.pdf",
+    "document_type": "application/pdf",
+    "metadata": {
+      "title": "My Document",
+      "author": "John Doe"
+    }
   }'
+```
 
-# 3. Query the system
-curl -X POST "${API_URL}/query" \
-  -H 'Content-Type: application/json' \
+### Query the Knowledge Base
+
+**Via Web UI:**
+```
+Open web app → Chat → Type question → Submit
+```
+
+**Via API:**
+```bash
+curl -X POST ${API_URL}/query \
+  -H "Content-Type: application/json" \
   -d '{
-    "query": "What is AWS Lambda?",
-    "user_id": "test@example.com"
+    "query": "What is the refund policy?",
+    "conversation_id": "conv-123"
   }'
+```
 
-# 4. Submit feedback
-curl -X POST "${API_URL}/feedback" \
-  -H 'Content-Type: application/json' \
+### Submit Feedback
+
+**Via Web UI:**
+```
+After query response → Click thumbs up/down → Add comment → Submit
+```
+
+**Via API:**
+```bash
+curl -X POST ${API_URL}/feedback \
+  -H "Content-Type: application/json" \
   -d '{
-    "request_id": "REQUEST_ID_FROM_STEP_3",
-    "user_id": "test@example.com",
-    "feedback_type": "thumbs_up"
+    "query_id": "query-123",
+    "rating": 5,
+    "thumbs": "up",
+    "comment": "Great response!"
   }'
 ```
 
 ---
 
-## 📊 **Monitoring**
+## 🔧 Configuration
 
-### **CloudWatch Dashboards:**
+### Environment Variables
 
-```bash
-# Main Dashboard
-https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=gka
-
-# Governance Dashboard
-https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=gka-governance
-
-# Quality Dashboard
-https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=gka-quality
-```
-
-### **Subscribe to Alerts:**
+Lambda functions use these environment variables (set automatically by Terraform):
 
 ```bash
-# Quality alerts
-aws sns subscribe \
-  --topic-arn $(cd iac && terraform output -raw quality_alerts_topic) \
-  --protocol email \
-  --notification-endpoint your-email@example.com
-
-# Compliance alerts
-aws sns subscribe \
-  --topic-arn $(cd iac && terraform output -raw compliance_alerts_topic) \
-  --protocol email \
-  --notification-endpoint compliance@example.com
+OPENSEARCH_DOMAIN              # OpenSearch endpoint
+METADATA_TABLE                 # DynamoDB table for document metadata
+CONVERSATION_TABLE             # DynamoDB table for conversations
+EVALUATION_TABLE               # DynamoDB table for quality evaluations
+AUDIT_TRAIL_TABLE              # DynamoDB table for audit logs
+USER_FEEDBACK_TABLE            # DynamoDB table for user feedback
+QUALITY_METRICS_TABLE          # DynamoDB table for quality metrics
+DOCUMENT_BUCKET                # S3 bucket for documents
+AUDIT_LOGS_BUCKET              # S3 bucket for audit archives
+ANALYTICS_EXPORTS_BUCKET       # S3 bucket for analytics exports
+GUARDRAIL_ID                   # Bedrock guardrail identifier
+GUARDRAIL_VERSION              # Bedrock guardrail version
+COMPLIANCE_ALERTS_TOPIC        # SNS topic for compliance alerts
+QUALITY_ALERTS_TOPIC           # SNS topic for quality alerts
+OPENSEARCH_SECRET_ARN          # Secrets Manager ARN for OpenSearch creds
 ```
 
----
+### Model Configuration
 
-## 🎓 **How It Works**
-
-### **Document Processing Flow:**
-```
-Upload → S3 → Lambda Processor →
-Semantic Chunking (1000 tokens) →
-Titan Embeddings (1536-dim) →
-OpenSearch Indexing (KNN) →
-Metadata Storage (DynamoDB)
-```
-
-### **Query Processing Flow:**
-```
-User Query → Lambda Handler →
-Hybrid Search (Vector 70% + Keyword 30%) →
-Re-ranking (Quality optimization) →
-Context Optimization (Token budget) →
-Dynamic Prompt Construction →
-Bedrock Model Invocation (3-tier) →
-Response Generation →
-Quality Evaluation (6 dimensions) →
-Return Response + Metrics
-```
-
-### **Safety Flow:**
-```
-Input → Guardrails Check → PII Detection → Process →
-Output Guardrails → Audit Log → Metrics → Alerts
-```
-
----
-
-## 💡 **Key Innovations**
-
-### **1. Hybrid Search (Phase 3)**
-- Combines semantic + keyword search
-- 91% precision vs 82% vector-only
-- Best of both approaches
-
-### **2. Dynamic Model Selection (Phase 4)**
-- 3-tier system based on complexity
-- 60% cost reduction
-- Maintains quality
-
-### **3. Quality Evaluation (Phase 6)**
-- 6-dimensional automated scoring
-- Real-time feedback
-- Continuous improvement
-
-### **4. Comprehensive Safety (Phase 5)**
-- Multi-layer protection
-- PII detection + redaction
-- 7-year audit trail
-- Compliance-ready
-
----
-
-## 🔧 **Customization**
-
-### **Adjust Search Strategy:**
+Edit model tiers in `lambda/query_handler/app.py`:
 
 ```python
-# In lambda/query_handler/app.py
+# Model tier configuration
+SIMPLE_MODEL = "amazon.titan-text-lite-v1"
+STANDARD_MODEL = "anthropic.claude-v2:1"
+ADVANCED_MODEL = "anthropic.claude-3-sonnet-20240229-v1:0"
 
-# More semantic (for conceptual queries)
-VECTOR_WEIGHT = 0.8
-KEYWORD_WEIGHT = 0.2
-
-# More keyword-focused (for technical queries)
-VECTOR_WEIGHT = 0.5
-KEYWORD_WEIGHT = 0.5
+# Model selection thresholds
+SIMPLE_THRESHOLD = 50    # Complexity score < 50 → Simple
+STANDARD_THRESHOLD = 75  # 50 <= score < 75 → Standard
+                         # score >= 75 → Advanced
 ```
 
-### **Change Chunking Strategy:**
+### Caching Configuration
 
 ```python
-# In lambda/document_processor/app.py
+# Cache TTL in seconds (default: 1 hour)
+CACHE_TTL = 3600
 
-# Larger chunks (more context)
-MAX_CHUNK_TOKENS = 1500
-
-# Smaller chunks (more precise)
-MAX_CHUNK_TOKENS = 500
-```
-
-### **Adjust Model Selection:**
-
-```python
-# In lambda/query_handler/app.py
-
-# More aggressive (use simple model more)
-SIMPLE_THRESHOLD = 15     # words
-ADVANCED_THRESHOLD = 35   # words
-
-# More quality-focused (use advanced more)
-SIMPLE_THRESHOLD = 5
-ADVANCED_THRESHOLD = 20
+# Disable caching
+ENABLE_CACHE = False
 ```
 
 ---
 
-## 🆘 **Troubleshooting**
+## 📊 Monitoring
 
-### **Common Issues:**
+### CloudWatch Dashboards
 
-**1. OpenSearch cluster red/yellow:**
 ```bash
-# Check cluster health
-aws opensearch describe-domain --domain-name gka-vector-search
+# Main dashboard
+open "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=gka"
 
-# Increase storage or nodes if needed
+# Governance dashboard
+open "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=gka-governance"
+
+# Quality dashboard
+open "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=gka-quality"
 ```
 
-**2. Lambda timeout errors:**
+### Lambda Logs
+
 ```bash
-# Increase timeout in iac/lambda.tf
-timeout = 300  # 5 minutes
+# Query handler logs
+aws logs tail /aws/lambda/gka-query-handler --follow
+
+# Document processor logs
+aws logs tail /aws/lambda/gka-document-processor --follow
+
+# All Lambda errors
+aws logs tail /aws/lambda/gka-* --follow --filter-pattern "ERROR"
 ```
 
-**3. High costs:**
+### Metrics
+
+**Key Metrics (CloudWatch):**
+- Query latency, cost, complexity
+- Model tier usage
+- Cache hit rate
+- Quality scores
+- PII detections
+- Guardrail blocks
+
+**See [OPERATIONS.md](./OPERATIONS.md) for detailed monitoring guide.**
+
+---
+
+## 💰 Cost Estimate
+
+**Monthly costs (moderate usage):**
+
+| Service | Cost |
+|---------|------|
+| Lambda (100K invocations) | $20-30 |
+| OpenSearch (2x r6g.large.search) | $250 |
+| DynamoDB (pay-per-request) | $5-10 |
+| S3 (storage + requests) | $5 |
+| Bedrock (usage-based) | $50-200 |
+| CloudWatch | $10-15 |
+| API Gateway | $3.50 |
+| Other (Cognito, SNS, CloudFront) | $5 |
+| **Total** | **$349-519/month** |
+
+**Cost optimization:**
+- Use `t3.small.search` for dev/test ($40/mo vs $250/mo)
+- Enable caching (reduces Bedrock calls by ~40%)
+- Use model tiering (saves ~30% on inference)
+
+**See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed cost breakdown.**
+
+---
+
+## 🛠️ Troubleshooting
+
+### Document Upload Fails (502 Error)
+
 ```bash
-# Check cost breakdown
-aws ce get-cost-and-usage --time-period Start=2023-12-01,End=2023-12-31 --granularity MONTHLY
+# Check Lambda logs
+aws logs tail /aws/lambda/gka-document-processor --follow
 
-# Enable more aggressive caching
-CACHE_TTL = 3600  # 1 hour
+# Rebuild and redeploy
+./build-lambda.sh
+cd iac && terraform apply
 ```
 
-**4. Low quality scores:**
+### Query Returns Empty Results
+
 ```bash
-# Increase search breadth
-VECTOR_K = 15
-KEYWORD_K = 15
+# Check if documents are indexed
+OPENSEARCH_ENDPOINT=$(cd iac && terraform output -raw opensearch_endpoint)
+curl -u admin:password "https://$OPENSEARCH_ENDPOINT/documents/_count"
 
-# Lower minimum score threshold
-MIN_SCORE = 0.2
+# Check metadata table
+aws dynamodb scan --table-name gka-metadata --max-items 5
+```
+
+### High Latency
+
+```bash
+# Check metrics
+aws cloudwatch get-metric-statistics \
+  --namespace GenAI/KnowledgeAssistant \
+  --metric-name QueryLatency \
+  --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
+  --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
+  --period 300 \
+  --statistics Average,Maximum
+
+# Increase Lambda memory
+aws lambda update-function-configuration \
+  --function-name gka-query-handler \
+  --memory-size 2048
+```
+
+**See [OPERATIONS.md](./OPERATIONS.md) for comprehensive troubleshooting guide.**
+
+---
+
+## 🔒 Security
+
+- ✅ **Encryption**: At-rest (S3, DynamoDB, OpenSearch) and in-transit (TLS 1.2+)
+- ✅ **PII Detection**: Automatic detection and redaction (AWS Comprehend)
+- ✅ **Content Filtering**: Bedrock guardrails for harmful content
+- ✅ **Access Control**: IAM roles with least privilege, Cognito authentication
+- ✅ **Audit Logging**: 7-year retention for compliance (SOC 2, HIPAA, GDPR ready)
+- ✅ **Secrets Management**: AWS Secrets Manager for credentials
+
+---
+
+## 📦 Project Structure
+
+```
+enterprise_genai_knowledge_assistant/
+├── iac/                        # Terraform infrastructure code
+│   ├── provider.tf             # AWS provider configuration
+│   ├── variables.tf            # Input variables
+│   ├── lambda.tf               # Lambda functions
+│   ├── opensearch.tf           # OpenSearch domain
+│   ├── dynamodb.tf             # DynamoDB tables
+│   ├── s3.tf                   # S3 buckets
+│   ├── api_gateway.tf          # API Gateway
+│   ├── amplify_cognito.tf      # Cognito user pool, identity pool
+│   ├── bedrock_guardrails.tf   # Content safety guardrails
+│   ├── monitoring_evaluation.tf # CloudWatch, SNS, EventBridge
+│   ├── governance_dashboard.tf # Governance dashboard
+│   ├── cloudwatch.tf           # Main dashboard
+│   ├── iam.tf                  # IAM roles and policies
+│   └── outputs.tf              # Output values
+├── lambda/                     # Lambda function code
+│   ├── document_processor/     # Document processing
+│   ├── query_handler/          # Query processing & RAG
+│   ├── quality_reporter/       # Daily quality reports
+│   ├── analytics_exporter/     # Weekly analytics export
+│   ├── audit_exporter/         # Daily audit archival
+│   └── shared/                 # Shared utilities
+├── web/                        # React web interface
+│   ├── src/
+│   │   ├── pages/              # Chat, DocumentUpload, Analytics, etc.
+│   │   ├── components/         # Reusable React components
+│   │   └── aws-exports.js      # AWS configuration
+│   ├── public/
+│   └── package.json
+├── build-lambda.sh             # Lambda build script
+├── README.md                   # This file
+├── ARCHITECTURE.md             # Complete architecture guide
+├── DEPLOYMENT.md               # Detailed deployment guide
+└── OPERATIONS.md               # Monitoring and operations guide
 ```
 
 ---
 
-## 📈 **Scaling**
+## 🤝 Contributing
 
-### **For 1M queries/month:**
-```hcl
-# In iac/opensearch.tf
-instance_count = 4  # Add more data nodes
-
-# In iac/lambda.tf
-memory_size = 2048  # Increase Lambda memory
-
-# Expected cost: ~$800/month
-```
-
-### **For 10M queries/month:**
-```hcl
-# OpenSearch
-instance_type = "r6g.xlarge.search"
-instance_count = 6
-
-# Lambda
-reserved_concurrent_executions = 500
-
-# DynamoDB
-billing_mode = "PROVISIONED"  # With auto-scaling
-
-# Expected cost: ~$2500/month
-```
+1. Create feature branch
+2. Make changes
+3. Test locally
+4. Update documentation
+5. Submit pull request
 
 ---
 
-## 🎉 **Project Status**
+## 📄 License
 
-**Implementation:** ✅ 100% Complete  
-**Testing:** ✅ Verified  
-**Documentation:** ✅ Comprehensive  
-**Production Ready:** ✅ Yes  
-**Deployment Time:** ⏱️ ~20 minutes  
-**Monthly Cost:** 💰 ~$357
-
-**Total Resources:**
-- 50+ AWS Resources
-- 25+ Terraform files
-- 10+ Lambda functions
-- 3 CloudWatch dashboards
-- 10 CloudWatch alarms
-- 7 DynamoDB tables
-- 4 S3 buckets
-- 15+ React components
+This project is for enterprise use. See your organization's license policy.
 
 ---
 
-## 🔗 **Links**
-
-- **AWS Console:**
-  - [CloudWatch Dashboards](https://console.aws.amazon.com/cloudwatch/)
-  - [Lambda Functions](https://console.aws.amazon.com/lambda/)
-  - [OpenSearch Domains](https://console.aws.amazon.com/aos/)
-  - [Bedrock](https://console.aws.amazon.com/bedrock/)
-
-- **Documentation:**
-  - [AWS Bedrock Docs](https://docs.aws.amazon.com/bedrock/)
-  - [OpenSearch Docs](https://docs.aws.amazon.com/opensearch-service/)
-  - [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/)
-
----
-
-## 📞 **Support**
+## 🆘 Support
 
 For issues or questions:
-1. Check the relevant phase documentation
-2. Review CloudWatch logs
-3. Check GitHub issues (if open source)
-4. Contact AWS Support for service-specific issues
+
+1. **Check documentation**: ARCHITECTURE.md, DEPLOYMENT.md, OPERATIONS.md
+2. **Review logs**: CloudWatch Logs for Lambda functions
+3. **Check dashboards**: CloudWatch dashboards for metrics
+4. **Verify resources**: Terraform outputs and AWS Console
 
 ---
 
-## 📄 **License**
+## 📈 Version
 
-See [LICENSE](LICENSE) file for details.
+**Current Version:** 1.0.0  
+**Last Updated:** December 2025
 
 ---
 
-## 🎉 **Ready to Deploy!**
-
-Your complete, enterprise-grade GenAI Knowledge Assistant is ready for production deployment. All 7 phases implemented with comprehensive documentation.
-
-**Deploy now and start leveraging AI for your knowledge management!** 🚀
+**Built with ❤️ using AWS Serverless Technologies**

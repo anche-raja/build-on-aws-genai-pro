@@ -1,78 +1,177 @@
+# Node.js Dependencies (HIGH PRIORITY - Large directories)
+node_modules/
+**/node_modules/
+
+# Build Outputs (HIGH PRIORITY - Generated files)
+build/
+dist/
+**/build/
+**/dist/
+
+# Lambda deployment packages
+lambda/*/package/
+lambda/*.zip
+lambda/**/deploy.zip
+iac/*.zip
+iac/lambda_*.zip
+
+# Terraform
+iac/.terraform/
+iac/.terraform.lock.hcl
+iac/terraform.tfstate
+iac/terraform.tfstate.backup
+iac/tfplan
+iac/*.tfplan
+*.tfvars
+!terraform.tfvars.example
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-venv/
-env/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
 *.egg
+*.egg-info/
+dist/
+build/
+*.whl
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
 
-# IDEs
+# Python Virtual Environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.virtualenv/
+pyvenv.cfg
+
+# Python Package Managers
+poetry.lock
+Pipfile.lock
+.pdm.toml
+__pypackages__/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Node.js / Web App
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Web Build Outputs
+web/build/
+web/dist/
+web/.next/
+web/out/
+web/.nuxt/
+web/.cache/
+web/.parcel-cache/
+
+# Web Dependencies & Locks
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Web Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# React / Create React App
+web/.eslintcache
+web/build/
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-.DS_Store
-
-# AWS
-.aws-sam/
-
-# Environment variables
-.env
-.env.local
-
-# Logs
-*.log
-
-# Deployment info
-deployment_info.txt
-
-# Node.js / npm / React
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-yarn.lock
-.pnp
-.pnp.js
-
-# React build output
-web/build/
-web/dist/
-
-# Testing
-coverage/
-.nyc_output/
-
-# Next.js (if used)
-.next/
-out/
-
-# Misc
-.cache/
-.parcel-cache/
-.eslintcache
-.stylelintcache
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.iml
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
+# Logs
+*.log
+logs/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# AWS
+.aws-sam/
+samconfig.toml
+.chalice/deployments/
+.chalice/venv/
+
+# Secrets & Credentials
+*.pem
+*.key
+*.cert
+secrets.json
+credentials.json
+.secrets/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage/
+*.cover
+
+# Documentation builds
+docs/_build/
+site/
+
+# Backup files
+*~
+*.orig
+*.rej

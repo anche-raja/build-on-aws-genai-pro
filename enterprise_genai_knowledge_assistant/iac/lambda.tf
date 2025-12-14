@@ -1,14 +1,32 @@
 # Data source for Lambda package archives
 data "archive_file" "document_processor" {
   type        = "zip"
-  source_dir  = "${path.module}/../lambda/document_processor"
+  source_dir  = "${path.module}/../lambda/document_processor/package"
   output_path = "${path.module}/lambda_document_processor.zip"
 }
 
 data "archive_file" "query_handler" {
   type        = "zip"
-  source_dir  = "${path.module}/../lambda/query_handler"
+  source_dir  = "${path.module}/../lambda/query_handler/package"
   output_path = "${path.module}/lambda_query_handler.zip"
+}
+
+data "archive_file" "quality_reporter" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambda/quality_reporter/package"
+  output_path = "${path.module}/lambda_quality_reporter.zip"
+}
+
+data "archive_file" "analytics_exporter" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambda/analytics_exporter/package"
+  output_path = "${path.module}/lambda_analytics_exporter.zip"
+}
+
+data "archive_file" "audit_exporter" {
+  type        = "zip"
+  source_dir  = "${path.module}/../lambda/audit_exporter/package"
+  output_path = "${path.module}/lambda_audit_exporter.zip"
 }
 
 # CloudWatch Log Groups

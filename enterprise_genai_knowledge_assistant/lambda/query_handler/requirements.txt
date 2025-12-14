@@ -1,6 +1,7 @@
-boto3==1.28.85
+# boto3 is provided by AWS Lambda runtime, no need to include it
 opensearch-py==2.3.1
 aws-requests-auth==0.4.3
 requests-aws4auth==1.2.3
-tiktoken==0.5.2
+# tiktoken is optional - code has fallback if not available
+# tiktoken==0.5.2
 
