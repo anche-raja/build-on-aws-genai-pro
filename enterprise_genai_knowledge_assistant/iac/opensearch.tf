@@ -34,6 +34,8 @@ resource "aws_opensearch_domain" "vector_search" {
       master_user_name     = "admin"
       master_user_password = random_password.opensearch_master_password.result
     }
+    # Allow IAM role-based access for Lambda
+    anonymous_auth_enabled = false
   }
 
   access_policies = jsonencode({

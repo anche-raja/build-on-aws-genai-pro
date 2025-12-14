@@ -88,12 +88,15 @@ export default function DocumentUpload({ user }) {
       setUploadProgress(90);
 
       // Step 2: Call document processor API
+      // Note: Amplify Storage automatically adds 'public/' prefix to uploaded files
+      const fullS3Key = `public/${s3Key}`;
+      
       const response = await post({
         apiName: 'GenAIAPI',
         path: '/documents',
         options: {
           body: {
-            document_key: s3Key,
+            document_key: fullS3Key,
             document_type: documentType,
           },
         },

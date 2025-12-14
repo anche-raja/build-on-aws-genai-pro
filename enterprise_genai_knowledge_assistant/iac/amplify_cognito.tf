@@ -161,6 +161,33 @@ resource "aws_iam_role_policy" "authenticated" {
           "execute-api:Invoke"
         ]
         Resource = "${aws_api_gateway_rest_api.genai_knowledge_assistant.execution_arn}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          "${aws_s3_bucket.document_bucket.arn}/public/*",
+          "${aws_s3_bucket.document_bucket.arn}/protected/$${cognito-identity.amazonaws.com:sub}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = aws_s3_bucket.document_bucket.arn
+        Condition = {
+          StringLike = {
+            "s3:prefix" = [
+              "public/*",
+              "protected/$${cognito-identity.amazonaws.com:sub}/*"
+            ]
+          }
+        }
       }
     ]
   })
@@ -237,6 +264,19 @@ resource "aws_s3_bucket_website_configuration" "amplify_deployment" {
 
   error_document {
     key = "index.html"
+  }
+}
+
+# CORS configuration for Amplify deployment bucket
+resource "aws_s3_bucket_cors_configuration" "amplify_deployment" {
+  bucket = aws_s3_bucket.amplify_deployment.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = ["*"]  # Static assets can be accessed from anywhere
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
   }
 }
 

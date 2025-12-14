@@ -26,35 +26,33 @@ Production-ready RAG-based knowledge assistant on AWS with intelligent model rou
            ┌───────────▼──────────┐  ┌─────────▼──────────┐
            │  Document Processor  │  │   Query Handler    │
            │      Lambda          │  │      Lambda        │
+           │   (NO Guardrails)    │  │  (WITH Guardrails) │
            └──────────┬───────────┘  └─────────┬──────────┘
                       │                        │
-    ┌─────────────────┼────────────────────────┼─────────────────────┐
-    │                 │   SAFETY & GOVERNANCE  │                     │
-    │  ┌──────────────▼────────────────────────▼──────────────┐    │
-    │  │         Amazon Bedrock Guardrails                     │    │
-    │  │  • Content Filtering  • PII Protection                │    │
-    │  │  • Topic Restrictions • Word Filtering                │    │
-    │  └───────────────────────────┬───────────────────────────┘    │
-    │  ┌───────────────────────────▼───────────────────────────┐    │
-    │  │         AWS Comprehend (PII Detection)                 │    │
-    │  │  • 20+ PII types  • Automatic redaction               │    │
-    │  └───────────────────────────┬───────────────────────────┘    │
-    └──────────────────────────────┼─────────────────────────────────┘
-                                   │
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                      DOCUMENT PROCESSING PIPELINE                            │
-│  S3 → Dynamic Chunking (semantic, 1000 tokens) → Embeddings (Titan)        │
-│  → OpenSearch KNN Index → Metadata (DynamoDB)                               │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                   │
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         QUERY PROCESSING PIPELINE                            │
-│  Cache Check → Hybrid Search (Vector+Keyword) → Re-ranking                 │
-│  → Model Selection (3-tier) → Dynamic Prompt → Bedrock → Validation        │
-│  → Audit Log → Cache/Store                                                 │
-└─────────────────────────────────────────────────────────────────────────────┘
+                      │             ┌──────────▼────────────────────────┐
+                      │             │   SAFETY & GOVERNANCE             │
+                      │             │  ┌────────────────────────────┐   │
+                      │             │  │  Bedrock Guardrails        │   │
+                      │             │  │  • Content Filtering       │   │
+                      │             │  │  • PII Protection          │   │
+                      │             │  │  • Topic Restrictions      │   │
+                      │             │  └────────────┬───────────────┘   │
+                      │             │  ┌────────────▼───────────────┐   │
+                      │             │  │  AWS Comprehend            │   │
+                      │             │  │  • PII Detection           │   │
+                      │             │  │  • Auto Redaction          │   │
+                      │             │  └────────────┬───────────────┘   │
+                      │             └───────────────┼───────────────────┘
+                      │                             │
+                      ▼                             ▼
+┌─────────────────────────────────────┐ ┌────────────────────────────────────┐
+│   DOCUMENT PROCESSING PIPELINE      │ │   QUERY PROCESSING PIPELINE        │
+│   (NO Security Checks)              │ │   (WITH Security Checks)           │
+│                                     │ │                                    │
+│  S3 → Chunking → Embeddings (Titan)│ │  Cache Check → Hybrid Search       │
+│  → OpenSearch → DynamoDB            │ │  → Re-ranking → Model Selection    │
+│                                     │ │  → Bedrock → Validation → Store    │
+└─────────────────────────────────────┘ └────────────────────────────────────┘
                                    │
                                    ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -77,12 +75,14 @@ Production-ready RAG-based knowledge assistant on AWS with intelligent model rou
 
 ## Request Flows
 
-### Document Upload Flow
+### Document Upload Flow (NO Security Checks)
 
 ```
 User uploads document
     ↓
-API Gateway /documents
+S3 Bucket (direct upload via Cognito credentials)
+    ↓
+API Gateway /documents (triggers processing)
     ↓
 Document Processor Lambda
     ↓
@@ -92,11 +92,16 @@ Dynamic Semantic Chunking (paragraphs, max 1000 tokens)
     ↓
 Generate Embeddings (Titan amazon.titan-embed-text-v1)
     ↓
-Index in OpenSearch (KNN, cosine similarity)
+Index in OpenSearch (KNN, cosine similarity, index: document-chunks)
     ↓
 Store Metadata (DynamoDB gka-metadata)
     ↓
-Return Success
+Return Success (document_id, chunk_count, total_tokens)
+
+⚠️ NOTE: No guardrails or PII detection at upload time
+   - Allows users to upload private/internal documents
+   - Security checks happen during query/response, not upload
+   - Documents stored as-is for vector search
 ```
 
 ### Query Flow with Governance
@@ -160,13 +165,17 @@ Return Safe Response to User
 
 ### Lambda Functions
 
-| Function | Purpose | Runtime | Memory | Key Features |
-|----------|---------|---------|--------|--------------|
-| **document_processor** | Ingest & index docs | Python 3.10 | 512 MB | Chunking, embeddings, OpenSearch indexing |
-| **query_handler** | Process queries | Python 3.10 | 1024 MB | RAG, model selection, guardrails, caching |
-| **quality_reporter** | Daily quality reports | Python 3.10 | 256 MB | Aggregate metrics, S3 export |
-| **analytics_exporter** | Weekly analytics | Python 3.10 | 256 MB | Usage analytics, cost analysis |
-| **audit_exporter** | Daily audit archival | Python 3.10 | 256 MB | Compliance logs to S3 |
+| Function | Purpose | Runtime | Memory | Security Features | Key Capabilities |
+|----------|---------|---------|--------|------------------|------------------|
+| **document_processor** | Ingest & index docs | Python 3.10 | 1024 MB | ❌ None | Chunking, embeddings (Titan), OpenSearch indexing |
+| **query_handler** | Process queries | Python 3.10 | 1024 MB | ✅ Guardrails + PII | RAG, model selection, caching, audit logging |
+| **quality_reporter** | Daily quality reports | Python 3.10 | 256 MB | ❌ None | Aggregate metrics, S3 export |
+| **analytics_exporter** | Weekly analytics | Python 3.10 | 256 MB | ❌ None | Usage analytics, cost analysis |
+| **audit_exporter** | Daily audit archival | Python 3.10 | 256 MB | ❌ None | Compliance logs to S3 |
+
+**Security Notes:**
+- **document_processor**: No guardrails or PII detection - documents stored as-is for enterprise use
+- **query_handler**: Full security stack - validates user queries AND AI responses before returning
 
 ### Model Selection Strategy
 
@@ -309,6 +318,93 @@ overall_score = (
 
 ---
 
+## Security Architecture
+
+### Two-Tier Security Model
+
+This system uses **Query-Time Security**, not Upload-Time Security:
+
+| Stage | Guardrails | PII Detection | Why? |
+|-------|------------|---------------|------|
+| **Document Upload** | ❌ No | ❌ No | Allows storing internal/private enterprise documents |
+| **Query Processing** | ✅ Yes (Input & Output) | ✅ Yes | Protects user interactions with AI |
+
+### Security Flow Diagram
+
+```
+┌─────────────────────────────────────┐
+│       DOCUMENT UPLOAD               │
+│                                     │
+│  User → S3 → Lambda → OpenSearch   │
+│                                     │
+│  ❌ NO SECURITY CHECKS              │
+│  ✅ Fast processing                 │
+│  ✅ Accepts enterprise data         │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│       QUERY PROCESSING              │
+│                                     │
+│  User Query                         │
+│    ↓                                │
+│  ✅ Guardrails Check (INPUT)        │
+│  ✅ PII Detection & Redaction       │
+│    ↓                                │
+│  OpenSearch → Bedrock               │
+│    ↓                                │
+│  ✅ Guardrails Check (OUTPUT)       │
+│  ✅ Audit Logging                   │
+│    ↓                                │
+│  Safe Response to User              │
+└─────────────────────────────────────┘
+```
+
+### Design Rationale
+
+**Why no guardrails on document upload?**
+
+✅ **Pros:**
+- Enterprise documents may contain legitimate PII (employee records, customer data)
+- Internal documents may discuss sensitive topics (legal, medical, financial)
+- Faster upload and processing (no validation overhead)
+- Documents are stored in private system, not public-facing
+
+⚠️ **Trade-offs:**
+- Malicious/inappropriate content could be indexed
+- PII in documents detected only when queried, not when uploaded
+- Requires trust in document sources (internal users)
+
+**Why guardrails on queries?**
+
+✅ **Protections:**
+- Prevents users from asking inappropriate questions
+- Detects and redacts PII in user queries
+- Validates AI responses before showing to users
+- Creates audit trail for compliance
+- Blocks harmful content generation
+
+### Security Components
+
+**1. Bedrock Guardrails (Query Handler Only)**
+- Content filtering: Sexual, violence, hate speech, insults
+- PII protection: Block or anonymize
+- Topic restrictions: Investment advice, medical/legal counsel
+- Word filters: Profanity, confidential terms
+- Applied to: User queries (INPUT) and AI responses (OUTPUT)
+
+**2. AWS Comprehend (Query Handler Only)**
+- Real-time PII detection (20+ types)
+- Automatic redaction: `[SSN]`, `[EMAIL]`, `[CREDIT_CARD]`
+- Query processed with redacted text
+- PII types logged for audit
+
+**3. Audit Trail (All Operations)**
+- DynamoDB: Real-time queryable records
+- CloudWatch: Centralized logging
+- S3: 7-year retention for compliance
+
+---
+
 ## Cost Breakdown (Monthly)
 
 | Category | Service | Cost |
@@ -341,8 +437,8 @@ overall_score = (
 ### Data Protection
 - ✅ Encryption at rest (S3: AES-256, DynamoDB: AWS-managed, OpenSearch: Node-to-node)
 - ✅ Encryption in transit (TLS 1.2+ for all API calls)
-- ✅ PII detection and redaction (AWS Comprehend)
-- ✅ Content filtering (Bedrock Guardrails)
+- ✅ PII detection and redaction (AWS Comprehend) - **Query-time only**
+- ✅ Content filtering (Bedrock Guardrails) - **Query-time only**
 
 ### Access Control
 - ✅ IAM roles with least privilege
