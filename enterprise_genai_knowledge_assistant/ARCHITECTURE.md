@@ -335,7 +335,7 @@ This system uses **Query-Time Security**, not Upload-Time Security:
 ┌─────────────────────────────────────┐
 │       DOCUMENT UPLOAD               │
 │                                     │
-│  User → S3 → Lambda → OpenSearch   │
+│  User → S3 → Lambda → OpenSearch    │
 │                                     │
 │  ❌ NO SECURITY CHECKS              │
 │  ✅ Fast processing                 │
