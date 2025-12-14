@@ -129,7 +129,7 @@ Query Handler Lambda
                   ▼
 ┌─────────────────────────────────────┐
 │ CONTEXT RETRIEVAL                   │
-│ 1. Hybrid Search (Vector 70% + KW 30%) │
+│ 1. Hybrid Search(Vector 70%+KW 30%) │
 │ 2. Re-rank Results by Relevance     │
 │ 3. Optimize Context (token limit)   │
 └─────────────────┬───────────────────┘
